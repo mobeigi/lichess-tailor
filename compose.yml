@@ -1,0 +1,16 @@
+services:
+  nginx:
+    build:
+      context: .
+      target: nginx
+    ports:
+      - "80"
+    depends_on:
+      - php-fpm
+    restart: unless-stopped
+
+  php-fpm:
+    build:
+      context: .
+      target: php-fpm
+    restart: unless-stopped
