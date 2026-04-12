@@ -301,18 +301,20 @@
 
     /* ── Created-by card ── */
     .created-card {
-      flex: 1;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 0.9rem 1rem;
+      gap: 0.5rem;
+      padding: 1.6rem 1rem;
     }
-    .created-card p {
-      font-size: 0.82rem;
+    .created-card span {
+      font-size: 1.2rem;
+      font-weight: 600;
       color: var(--muted);
-      margin-bottom: 0.3rem;
     }
+
     .created-card a {
       display: inline-block;
       font-size: 1.2rem;
@@ -322,6 +324,7 @@
       transition: color 0.15s;
     }
     .created-card a:hover { color: var(--accent-h); }
+    .created-card img { height: 24px; width: auto; }
 
     /* ── Board card ── */
     .board-card { padding: 1.25rem; }
@@ -368,7 +371,7 @@
     }
 
     /* ── Output card ── */
-    .output-card { display: flex; flex-direction: column; gap: 0.75rem; }
+    .output-card { flex: 1; display: flex; flex-direction: column; gap: 0.75rem; }
 
     .output-header {
       display: flex;
@@ -799,9 +802,11 @@
       <!-- Created by -->
       <div class="card created-card">
         <div>
-          <p>Created by</p>
-          <a href="https://mobeigi.com" target="_blank" rel="external">Mo Beigi</a>
+          <span>Created by </span><a href="https://mobeigi.com" target="_blank" rel="external">Mo Beigi</a>
         </div>
+        <a href="https://github.com/mobeigi/lichess-tailor" target="_blank" rel="external noreferrer">
+          <img src="https://img.shields.io/github/stars/mobeigi/lichess-tailor?style=social" alt="GitHub Stars">
+        </a>
       </div>
 
     </div><!-- /sidebar -->
