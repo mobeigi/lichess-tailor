@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lichess Tailor</title>
+  <meta name="description" content="Customise your Lichess board with custom styles using user-style browser extensions.">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="Lichess Tailor">
+  <meta property="og:description" content="Customise your Lichess board with custom styles using user-style browser extensions.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="/logo512.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Lichess Tailor">
+  <meta name="twitter:description" content="Customise your Lichess board with custom styles using user-style browser extensions.">
+  <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-title" content="Lichess Tailor">
+  <link rel="manifest" href="/site.webmanifest">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0d0d14;
+      --surface:  #13131f;
+      --surface2: #1b1b2e;
+      --border:   #2a2a42;
+      --accent:   #6d28d9;
+      --accent-h: #7c3aed;
+      --text:     #dcdcee;
+      --muted:    #6b6b8a;
+      --green:    #10b981;
+      --red:      #ef4444;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 14px;
+      min-height: 100vh;
+      padding: 1.25rem 1rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* ── Header ── */
+    header {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .header-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 6px;
+      text-decoration: none;
+      user-select: none;
+    }
+
+    .header-logo {
+      width: 2.4rem;
+      height: 2.4rem;
+      flex-shrink: 0;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #a855f7 0%, #60a5fa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+    }
+
+    header p { color: var(--muted); font-size: 0.9rem; }
+
+    /* ── Info popover ── */
+    .info-wrap {
+      position: relative;
+      display: inline-block;
+    }
+    .info-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      padding: 0 0 0 5px;
+      display: inline-flex;
+      align-items: center;
+      vertical-align: -0.15em;
+      transition: color 0.15s;
+      position: relative;
+    }
+    .info-btn:hover { color: var(--text); }
+    .info-btn::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 5px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 300;
+    }
+    .info-btn:hover::after { opacity: 1; }
+    .info-popover-close {
+      position: absolute;
+      top: 0.45rem;
+      right: 0.5rem;
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: color 0.15s;
+    }
+    .info-popover-close:hover { color: var(--text); }
+    .info-popover {
+      position: fixed;
+      transform: translateX(-50%);
+      width: 290px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      z-index: 200;
+      text-align: left;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.45);
+    }
+    .info-popover::before {
+      content: '';
+      position: absolute;
+      top: -5px;
+      left: var(--arrow-left, 50%);
+      transform: translateX(-50%) rotate(45deg);
+      width: 9px;
+      height: 9px;
+      background: var(--surface2);
+      border-left: 1px solid var(--border);
+      border-top: 1px solid var(--border);
+    }
+    .info-popover[hidden] { display: none; }
+    .info-popover-title {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 0.55rem;
+    }
+    .info-popover ol {
+      margin: 0 0 0.65rem 1.1rem;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    .info-popover li { font-size: 0.82rem; color: var(--text); line-height: 1.45; }
+    .info-popover a { color: var(--accent-h); text-decoration: none; }
+    .info-popover a:hover { text-decoration: underline; }
+    .info-popover-footer { font-size: 0.75rem; color: var(--muted); }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 0;
+    }
+
+    .card-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 0.6rem;
+    }
+
+    /* ── Controls ── */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: 1.5rem;
+    }
+
+    .ctrl-group { display: flex; flex-direction: column; gap: 6px; }
+
+    .ctrl-label { font-size: 0.78rem; color: var(--muted); }
+
+    select {
+      appearance: none;
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem 2.25rem 0.5rem 0.8rem;
+      font-size: 0.88rem;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b6b8a'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.7rem center;
+      min-width: 150px;
+      width: 100%;
+    }
+
+    select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+    /* ── Color picker pair ── */
+    .color-pairs { display: flex; gap: 1.25rem; flex-wrap: wrap; }
+
+    .color-pair { display: flex; flex-direction: column; gap: 5px; }
+
+    .color-pair-label { font-size: 0.75rem; color: var(--muted); }
+
+    .color-row { display: flex; align-items: center; gap: 8px; }
+
+    /* Swatch wraps a native color input */
+    .swatch {
+      position: relative;
+      width: 40px;
+      height: 40px;
+      border-radius: 9px;
+      overflow: hidden;
+      border: 2px solid var(--border);
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: border-color 0.15s;
+    }
+    .swatch:hover { border-color: var(--muted); }
+
+    .swatch input[type="color"] {
+      position: absolute;
+      inset: -6px;
+      width: calc(100% + 12px);
+      height: calc(100% + 12px);
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      opacity: 1;
+    }
+
+    .hex-in {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.42rem 0.65rem;
+      font-family: "SF Mono", "Fira Code", monospace;
+      font-size: 0.82rem;
+      width: 84px;
+      transition: border-color 0.15s;
+    }
+    .hex-in:focus { outline: none; border-color: var(--accent); }
+    .hex-in.bad   { border-color: var(--red); }
+
+    /* ── Page grid: left (preview + CSS) | right (sidebar config) ── */
+    .page-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 1rem;
+      align-items: stretch;
+    }
+
+    @media (max-width: 860px) {
+      .page-grid { grid-template-columns: 1fr; }
+    }
+
+    .left-col {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      height: 100%;
+    }
+
+    /* ── Created-by card ── */
+    .created-card {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0.9rem 1rem;
+    }
+    .created-card p {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 0.3rem;
+    }
+    .created-card a {
+      display: inline-block;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .created-card a:hover { color: var(--accent-h); }
+
+    /* ── Board card ── */
+    .board-card { padding: 1.25rem; }
+
+    .board-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.6rem;
+    }
+
+    .turn-indicator {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .turn-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .turn-dot.white {
+      background: #f0ece4;
+      box-shadow: 0 0 0 2px rgba(240,236,228,0.25);
+    }
+    .turn-dot.black {
+      background: #2a2a2a;
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.12);
+    }
+
+    #board-wrap {
+      display: block;
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 3px;
+      overflow: hidden;
+      box-shadow: 0 6px 32px rgba(0,0,0,0.55);
+    }
+
+    /* ── Output card ── */
+    .output-card { display: flex; flex-direction: column; gap: 0.75rem; }
+
+    .output-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    textarea#css-out {
+      width: 100%;
+      height: 100px;
+      resize: vertical;
+      background: #0b0e16;
+      color: #7dd3fc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.9rem 1rem;
+      font-family: "SF Mono","Fira Code","Consolas", monospace;
+      font-size: 0.7rem;
+      line-height: 1.7;
+      tab-size: 2;
+    }
+
+    textarea#css-out:focus { outline: none; border-color: var(--accent); }
+
+    /* Custom scrollbar (webkit) */
+    textarea#css-out::-webkit-scrollbar { width: 7px; }
+    textarea#css-out::-webkit-scrollbar-track { background: transparent; }
+    textarea#css-out::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    /* ── Overlay grid (single column in sidebar) ── */
+    .ov-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .ov-item { display: flex; flex-direction: column; gap: 0.45rem; }
+
+    .ov-head { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.15rem; }
+
+    .ov-name { font-size: 0.82rem; font-weight: 500; color: var(--text); white-space: nowrap; flex-shrink: 0; }
+
+    .ov-mode {
+      appearance: none;
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.28rem 1.6rem 0.28rem 0.55rem;
+      font-size: 0.78rem;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b6b8a'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.45rem center;
+    }
+    .ov-mode:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+    .ov-alpha-row { display: flex; align-items: center; gap: 8px; margin-top: 2px; }
+
+    .alpha-lbl { font-size: 0.78rem; color: var(--muted); width: 1rem; flex-shrink: 0; font-style: italic; }
+
+    .alpha-slider {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      flex: 1;
+      height: 6px;
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+    }
+    .alpha-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 15px; height: 15px;
+      border-radius: 50%;
+      background: var(--text);
+      border: 2px solid var(--bg);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+      cursor: pointer;
+    }
+    .alpha-slider::-moz-range-thumb {
+      width: 15px; height: 15px;
+      border-radius: 50%;
+      background: var(--text);
+      border: 2px solid var(--bg);
+      cursor: pointer;
+    }
+    .alpha-slider::-moz-range-track { height: 6px; border-radius: 3px; }
+
+    .alpha-val { font-family: "SF Mono","Fira Code",monospace; font-size: 0.78rem; color: var(--muted); min-width: 34px; text-align: right; }
+
+    /* Full-width divider inside the overlay list */
+    .col-divider {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin: 0.25rem 0;
+    }
+    .col-divider-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .col-divider-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Presets ── */
+    .presets-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .preset-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      cursor: pointer;
+    }
+    .preset-thumb {
+      width: 40px;
+      height: 40px;
+      border-radius: 7px;
+      border: 2px solid var(--border);
+      overflow: hidden;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .preset-item:hover .preset-thumb { border-color: var(--muted); }
+    .preset-item.active .preset-thumb { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(124,58,237,0.3); }
+    .preset-name { font-size: 0.65rem; color: var(--muted); text-align: center; }
+    .preset-item.active .preset-name { color: var(--text); }
+
+    /* ── Copy button ── */
+    .copy-btn {
+      align-self: flex-end;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 1.1rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      min-width: 108px;
+      height: 2.1rem;
+    }
+    .copy-btn:hover  { background: var(--accent-h); }
+    .copy-btn:active { transform: scale(0.96); }
+    .copy-btn.ok     { background: var(--green); }
+  /* ── Reset button ── */
+    .reset-btn {
+      margin-top: 0.75rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.4rem 0.9rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      display: block;
+      width: 100%;
+    }
+    .reset-btn:hover  { background: var(--accent-h); }
+    .reset-btn:active { transform: scale(0.96); }
+
+  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@lichess-org/chessground@10.1.1/assets/chessground.base.min.css">
+  <style>
+    /* Board background via ::before (base CSS has none — must declare here) */
+    cg-board::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+    }
+    /* CBurnett piece images */
+    cg-board piece { background-size: 100%; background-repeat: no-repeat; }
+    piece.pawn.white   { background-image: url('https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/cburnett/wP.svg'); }
+    piece.knight.white { background-image: url('https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/cburnett/wN.svg'); }
+    piece.bishop.white { background-image: url('https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/cburnett/wB.svg'); }
+    piece.rook.white   { background-image: url('https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/cburnett/wR.svg'); }
+    piece.queen.white  { background-image: url('https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/cburnett/wQ.svg'); }
+    piece.king.white   { background-image: url('https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/cburnett/wK.svg'); }
+    piece.pawn.black   { background-image: url('https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/cburnett/bP.svg'); }
+    piece.knight.black { background-image: url('https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/cburnett/bN.svg'); }
+    piece.bishop.black { background-image: url('https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/cburnett/bB.svg'); }
+    piece.rook.black   { background-image: url('https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/cburnett/bR.svg'); }
+    piece.queen.black  { background-image: url('https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/cburnett/bQ.svg'); }
+    piece.king.black   { background-image: url('https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/cburnett/bK.svg'); }
+  </style>
+  <style id="preview-css"></style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <a href="/" class="header-title">
+      <img src="/logo512.png" alt="Lichess Tailor logo" class="header-logo">
+      <h1>Lichess Tailor</h1>
+    </a>
+    <p>
+      Customise your Lichess board with custom styles using user-style browser extensions.
+      <span class="info-wrap">
+        <button class="info-btn" id="info-btn" aria-label="How to use" data-tooltip="How to use">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+        </button>
+        <div class="info-popover" id="info-popover" hidden>
+          <button class="info-popover-close" id="info-popover-close" aria-label="Close">✕</button>
+          <div class="info-popover-title">How to use</div>
+          <ol>
+            <li>Install a User Style extension (recommended is Stylus for <a href="https://chromewebstore.google.com/detail/stylus/clngdbkpkpeebahjckkjfobafhncgmne" target="_blank" rel="external">Chrome</a> or <a href="https://addons.mozilla.org/firefox/addon/styl-us/" target="_blank" rel="external">Firefox</a>).</li>
+            <li>Customise your board colours and overlays using the controls.</li>
+            <li>Click <strong>Install</strong> on the Generated User Style card to apply on lichess.org.</li>
+          </ol>
+          <div class="info-popover-footer">See also: <a href="https://lichess.org/page/userstyles" target="_blank" rel="external">Lichess user styles guide</a></div>
+        </div>
+      </span>
+    </p>
+  </header>
+
+  <div class="page-grid">
+
+    <!-- Left: large preview + generated CSS -->
+    <div class="left-col">
+
+      <div class="card board-card">
+        <div class="board-card-header">
+          <div class="card-label" style="margin:0">Preview</div>
+          <div class="turn-indicator" id="turn-indicator">
+            <span class="turn-dot" id="turn-dot"></span>
+            <span id="turn-text"></span>
+          </div>
+        </div>
+        <div id="board-wrap"></div>
+        <button id="reset-btn" class="reset-btn">↺ Reset</button>
+      </div>
+
+      <div class="card output-card">
+        <div class="output-header">
+          <div class="card-label" style="margin:0">Generated User Style</div>
+          <div style="display:flex;gap:0.5rem">
+            <button class="copy-btn" id="install-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3v13"/>
+                <path d="M8 13l4 4 4-4"/>
+                <path d="M3 19v1a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-1"/>
+              </svg>
+              Install
+            </button>
+            <button class="copy-btn" id="download-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <path d="M12 11v6"/>
+                <path d="M9 15l3 3 3-3"/>
+              </svg>
+              Download
+            </button>
+            <button class="copy-btn" id="share-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+              </svg>
+              Share
+            </button>
+            <button class="copy-btn" id="copy-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2"/>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+              Copy CSS
+            </button>
+          </div>
+        </div>
+        <textarea id="css-out" readonly spellcheck="false"></textarea>
+      </div>
+
+    </div>
+
+    <!-- Right: configuration sidebar -->
+    <div class="sidebar">
+
+      <!-- Presets -->
+      <div class="card">
+        <div class="col-divider" style="margin-bottom:0.6rem">
+          <span class="col-divider-label">Presets</span>
+          <div class="col-divider-line"></div>
+        </div>
+        <div class="presets-grid" id="presets-grid"></div>
+      </div>
+
+      <!-- Colours -->
+      <div class="card">
+        <div class="col-divider" style="margin-bottom:0.6rem">
+          <span class="col-divider-label">Colours</span>
+          <div class="col-divider-line"></div>
+        </div>
+        <div class="ov-grid">
+
+          <!-- Light squares -->
+          <div class="ov-item">
+            <div class="ov-head"><span class="ov-name">Light Squares</span></div>
+            <div class="color-row">
+              <div class="swatch" id="sq1-sw"><input type="color" id="sq1-color" value="#edd6b0"></div>
+              <input type="text" class="hex-in" id="sq1-hex" value="#edd6b0" maxlength="7" spellcheck="false">
+            </div>
+            <div class="ov-alpha-row">
+              <span class="alpha-lbl">α</span>
+              <input type="range" class="alpha-slider" id="sq1-alpha" min="0" max="100" value="100">
+              <span class="alpha-val" id="sq1-alpha-val">100%</span>
+            </div>
+          </div>
+
+          <!-- Dark squares -->
+          <div class="ov-item">
+            <div class="ov-head"><span class="ov-name">Dark Squares</span></div>
+            <div class="color-row">
+              <div class="swatch" id="sq2-sw"><input type="color" id="sq2-color" value="#b88762"></div>
+              <input type="text" class="hex-in" id="sq2-hex" value="#b88762" maxlength="7" spellcheck="false">
+            </div>
+            <div class="ov-alpha-row">
+              <span class="alpha-lbl">α</span>
+              <input type="range" class="alpha-slider" id="sq2-alpha" min="0" max="100" value="100">
+              <span class="alpha-val" id="sq2-alpha-val">100%</span>
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <div class="col-divider">
+            <span class="col-divider-label">Overlays</span>
+            <div class="col-divider-line"></div>
+          </div>
+
+          <!-- Last Move -->
+          <div class="ov-item">
+            <div class="ov-head"><span class="ov-name">Last Move</span></div>
+            <div class="color-row">
+              <div class="swatch" id="lm-sw"><input type="color" id="lm-color" value="#f6eb72"></div>
+              <input type="text" class="hex-in" id="lm-hex" value="#f6eb72" maxlength="7" spellcheck="false">
+            </div>
+            <div class="ov-alpha-row">
+              <span class="alpha-lbl">α</span>
+              <input type="range" class="alpha-slider" id="lm-alpha" min="0" max="100" value="60">
+              <span class="alpha-val" id="lm-alpha-val">60%</span>
+            </div>
+          </div>
+
+          <!-- Selected -->
+          <div class="ov-item">
+            <div class="ov-head"><span class="ov-name">Selected</span></div>
+            <div class="color-row">
+              <div class="swatch" id="sel-sw"><input type="color" id="sel-color" value="#5aa7cc"></div>
+              <input type="text" class="hex-in" id="sel-hex" value="#5aa7cc" maxlength="7" spellcheck="false">
+            </div>
+            <div class="ov-alpha-row">
+              <span class="alpha-lbl">α</span>
+              <input type="range" class="alpha-slider" id="sel-alpha" min="0" max="100" value="60">
+              <span class="alpha-val" id="sel-alpha-val">60%</span>
+            </div>
+          </div>
+
+          <!-- Move Destination -->
+          <div class="ov-item">
+            <div class="ov-head">
+              <span class="ov-name">Move Destination</span>
+              <select class="ov-mode" id="md-mode">
+                <option value="dot">Dot</option>
+                <option value="square">Square</option>
+              </select>
+            </div>
+            <div class="color-row">
+              <div class="swatch" id="md-sw"><input type="color" id="md-color" value="#573017"></div>
+              <input type="text" class="hex-in" id="md-hex" value="#573017" maxlength="7" spellcheck="false">
+            </div>
+            <div class="ov-alpha-row">
+              <span class="alpha-lbl">α</span>
+              <input type="range" class="alpha-slider" id="md-alpha" min="0" max="100" value="60">
+              <span class="alpha-val" id="md-alpha-val">60%</span>
+            </div>
+          </div>
+
+          <!-- Captures (premove capture highlight) -->
+          <div class="ov-item">
+            <div class="ov-head"><span class="ov-name">Captures</span></div>
+            <div class="color-row">
+              <div class="swatch" id="oc-sw"><input type="color" id="oc-color" value="#ff7d7d"></div>
+              <input type="text" class="hex-in" id="oc-hex" value="#ff7d7d" maxlength="7" spellcheck="false">
+            </div>
+            <div class="ov-alpha-row">
+              <span class="alpha-lbl">α</span>
+              <input type="range" class="alpha-slider" id="oc-alpha" min="0" max="100" value="60">
+              <span class="alpha-val" id="oc-alpha-val">60%</span>
+            </div>
+          </div>
+
+          <!-- Premove -->
+          <div class="ov-item">
+            <div class="ov-head"><span class="ov-name">Premove</span></div>
+            <div class="color-row">
+              <div class="swatch" id="pm-sw"><input type="color" id="pm-color" value="#bb37bc"></div>
+              <input type="text" class="hex-in" id="pm-hex" value="#bb37bc" maxlength="7" spellcheck="false">
+            </div>
+            <div class="ov-alpha-row">
+              <span class="alpha-lbl">α</span>
+              <input type="range" class="alpha-slider" id="pm-alpha" min="0" max="100" value="60">
+              <span class="alpha-val" id="pm-alpha-val">60%</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Created by -->
+      <div class="card created-card">
+        <div>
+          <p>Created by</p>
+          <a href="https://mobeigi.com" target="_blank" rel="external">Mo Beigi</a>
+        </div>
+      </div>
+
+    </div><!-- /sidebar -->
+
+  </div><!-- /page-grid -->
+</div>
+
+<script>
+
+function makeSVG(c1, c2) {
+  return [
+    '<?xml version="1.0" encoding="UTF-8" standalone="no"?>',
+    '<svg xmlns="http://www.w3.org/2000/svg" xmlns:x="http://www.w3.org/1999/xlink"',
+    '     viewBox="0 0 8 8" shape-rendering="crispEdges">',
+    '<g id="a">',
+    '  <g id="b">',
+    '    <g id="c">',
+    '      <g id="d">',
+    `        <rect width="1" height="1" id="e" fill="${c1}"/>`,
+    '        <use x="1" y="1" href="#e" x:href="#e"/>',
+    `        <rect y="1" width="1" height="1" id="f" fill="${c2}"/>`,
+    '        <use x="1" y="-1" href="#f" x:href="#f"/>',
+    '      </g>',
+    '      <use x="2" href="#d" x:href="#d"/>',
+    '    </g>',
+    '    <use x="4" href="#c" x:href="#c"/>',
+    '  </g>',
+    '  <use y="2" href="#b" x:href="#b"/>',
+    '</g>',
+    '<use y="4" href="#a" x:href="#a"/>',
+    '</svg>'
+  ].join('\n');
+}
+
+function toRgba(hex, alphaPercent) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const a = parseFloat((alphaPercent / 100).toFixed(2));
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
+}
+
+function ovRgba(prefix) {
+  return toRgba(
+    document.getElementById(`${prefix}-color`).value,
+    parseInt(document.getElementById(`${prefix}-alpha`).value)
+  );
+}
+
+function generateCSS(c1rgba, c2rgba) {
+  const b64 = btoa(makeSVG(c1rgba, c2rgba));
+  const lmRgba  = ovRgba('lm');
+  const selRgba = ovRgba('sel');
+  const mdRgba  = ovRgba('md');
+  const ocRgba  = ovRgba('oc');
+  const pmRgba  = ovRgba('pm');
+  const mdMode  = document.getElementById('md-mode').value;
+
+  const mdCss = mdMode === 'dot'
+    ? `background: radial-gradient(${mdRgba} 19%, rgba(0, 0, 0, 0) 20%) !important;`
+    : `background: unset !important;\n      background-color: ${mdRgba} !important;`;
+
+  return `/* ==UserStyle==
+@name           Lichess Tailor style for lichess.org
+@namespace      github.com/mobeigi/lichess-tailor
+@version        1.0.0
+@description    Custom board colours and overlay highlights for lichess.org, generated by Lichess Tailor.
+@author         Mo Beigi
+==/UserStyle== */
+
+@-moz-document domain("lichess.org") {
+    cg-board::before {
+      background-color: ${c1rgba} !important;
+      background-image: url('data:image/svg+xml;base64,${b64}') !important;
+      filter: unset !important;
+    }
+
+    cg-wrap coords:nth-child(odd) coord:nth-child(odd),
+    cg-wrap.orientation-black coords:nth-child(odd) coord:nth-child(even),
+    cg-wrap coords.files:nth-child(even) coord:nth-child(odd),
+    cg-wrap.orientation-black coords.files:nth-child(even) coord:nth-child(even) {
+      color: ${c1rgba} !important;
+    }
+
+    cg-wrap coords:nth-child(odd) coord:nth-child(even),
+    cg-wrap.orientation-black coords:nth-child(odd) coord:nth-child(odd),
+    cg-wrap coords.files:nth-child(even) coord:nth-child(even),
+    cg-wrap.orientation-black coords.files:nth-child(even) coord:nth-child(odd) {
+      color: ${c2rgba} !important;
+    }
+
+    cg-board square.last-move {
+      background-color: ${lmRgba} !important;
+    }
+
+    cg-board square.selected {
+      background-color: ${selRgba} !important;
+    }
+
+    cg-board square.move-dest, cg-board square.premove-dest {
+      ${mdCss}
+    }
+
+    cg-board square.oc {
+      background: unset !important;
+      background-color: ${ocRgba} !important;
+    }
+
+    cg-board square.current-premove, cg-board square.last-premove {
+      background-color: ${pmRgba} !important;
+    }
+}`;
+}
+
+function update() {
+  const c1rgba = ovRgba('sq1');
+  const c2rgba = ovRgba('sq2');
+  const fullCSS = generateCSS(c1rgba, c2rgba);
+  const inner = fullCSS.replace(/^[\s\S]*?@-moz-document[^{]+\{([\s\S]*)\}$/, '$1').trim();
+  document.getElementById('preview-css').textContent = inner;
+  document.getElementById('css-out').value = fullCSS;
+}
+
+function setSliderGradient(slider, hex) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  slider.style.background =
+    `linear-gradient(to right, rgba(${r},${g},${b},0.15) 0%, rgb(${r},${g},${b}) 100%)`;
+}
+
+function wireOverlay(prefix) {
+  const picker = document.getElementById(`${prefix}-color`);
+  const hex    = document.getElementById(`${prefix}-hex`);
+  const swatch = document.getElementById(`${prefix}-sw`);
+  const slider = document.getElementById(`${prefix}-alpha`);
+  const valEl  = document.getElementById(`${prefix}-alpha-val`);
+
+  swatch.style.background = picker.value;
+  setSliderGradient(slider, picker.value);
+
+  picker.addEventListener('input', () => {
+    hex.value = picker.value;
+    hex.classList.remove('bad');
+    swatch.style.background = picker.value;
+    setSliderGradient(slider, picker.value);
+    update();
+    syncPresetHighlight();
+  });
+  hex.addEventListener('input', () => {
+    const v = hex.value.trim();
+    if (/^#[0-9A-Fa-f]{6}$/.test(v)) {
+      picker.value = v;
+      hex.classList.remove('bad');
+      swatch.style.background = v;
+      setSliderGradient(slider, v);
+      update();
+      syncPresetHighlight();
+    } else {
+      hex.classList.add('bad');
+    }
+  });
+  slider.addEventListener('input', () => {
+    valEl.textContent = slider.value + '%';
+    update();
+    syncPresetHighlight();
+  });
+}
+
+const PRESETS = {
+  duo: [
+    {
+      name: 'Walnut',
+      sq1: '#edd6b0', sq1A: 100, sq2: '#b88762', sq2A: 100,
+      lm: '#f6eb72', lmA: 60,
+      sel: '#5aa7cc', selA: 60,
+      md: '#573017', mdA: 60, mdMode: 'dot',
+      oc: '#ff7d7d', ocA: 60,
+      pm: '#bb37bc', pmA: 60,
+    },
+    {
+      name: 'Classic',
+      sq1: '#f5f5f0', sq1A: 100, sq2: '#5c5c5c', sq2A: 100,
+      lm: '#f6eb72', lmA: 60,
+      sel: '#5aa7cc', selA: 60,
+      md: '#888888', mdA: 60, mdMode: 'dot',
+      oc: '#ff7d7d', ocA: 60,
+      pm: '#bb37bc', pmA: 60,
+    },
+    {
+      name: 'Forest',
+      sq1: '#eeeed2', sq1A: 100, sq2: '#769656', sq2A: 100,
+      lm: '#cdd16a', lmA: 70,
+      sel: '#5bc0de', selA: 60,
+      md: '#3a5a28', mdA: 60, mdMode: 'dot',
+      oc: '#ff7d7d', ocA: 60,
+      pm: '#bb37bc', pmA: 60,
+    },
+    {
+      name: 'Crimson',
+      sq1: '#fce8e8', sq1A: 100, sq2: '#c0392b', sq2A: 100,
+      lm: '#f6eb72', lmA: 60,
+      sel: '#5aa7cc', selA: 60,
+      md: '#7a1515', mdA: 60, mdMode: 'dot',
+      oc: '#ff9944', ocA: 60,
+      pm: '#bb37bc', pmA: 60,
+    },
+    {
+      name: 'Ocean',
+      sq1: '#ddeeff', sq1A: 100, sq2: '#2563a8', sq2A: 100,
+      lm: '#f6eb72', lmA: 60,
+      sel: '#48c9b0', selA: 60,
+      md: '#0d2f5e', mdA: 60, mdMode: 'dot',
+      oc: '#ff7d7d', ocA: 60,
+      pm: '#bb37bc', pmA: 60,
+    },
+    {
+      name: 'Midnight',
+      sq1: '#e8e0f7', sq1A: 100, sq2: '#6d28d9', sq2A: 100,
+      lm: '#f6eb72', lmA: 60,
+      sel: '#5aa7cc', selA: 60,
+      md: '#3b1074', mdA: 60, mdMode: 'dot',
+      oc: '#ff7d7d', ocA: 60,
+      pm: '#f59e0b', pmA: 60,
+    },
+    {
+      name: 'Amber',
+      sq1: '#fff8e7', sq1A: 100, sq2: '#d97706', sq2A: 100,
+      lm: '#f6eb72', lmA: 60,
+      sel: '#5aa7cc', selA: 60,
+      md: '#7c3a00', mdA: 60, mdMode: 'dot',
+      oc: '#ff7d7d', ocA: 60,
+      pm: '#bb37bc', pmA: 60,
+    },
+  ]
+};
+
+function applyPreset(p) {
+  function setOverlay(prefix, hex, alpha) {
+    const picker = document.getElementById(`${prefix}-color`);
+    const hexIn  = document.getElementById(`${prefix}-hex`);
+    const sw     = document.getElementById(`${prefix}-sw`);
+    const slider = document.getElementById(`${prefix}-alpha`);
+    const valEl  = document.getElementById(`${prefix}-alpha-val`);
+    picker.value = hex;
+    hexIn.value  = hex;
+    hexIn.classList.remove('bad');
+    sw.style.background = hex;
+    setSliderGradient(slider, hex);
+    slider.value = alpha;
+    valEl.textContent = alpha + '%';
+  }
+  setOverlay('sq1', p.sq1, p.sq1A);
+  setOverlay('sq2', p.sq2, p.sq2A);
+  setOverlay('lm',  p.lm,  p.lmA);
+  setOverlay('sel', p.sel, p.selA);
+  setOverlay('md',  p.md,  p.mdA);
+  setOverlay('oc',  p.oc,  p.ocA);
+  setOverlay('pm',  p.pm,  p.pmA);
+  if (p.mdMode) document.getElementById('md-mode').value = p.mdMode;
+  update();
+}
+
+function syncPresetHighlight() {
+  const style = 'duo';
+  const container = document.getElementById('presets-grid');
+  if (!container) return;
+  const list = PRESETS[style] || [];
+  const cur = {
+    sq1:  document.getElementById('sq1-color').value,
+    sq1A: parseInt(document.getElementById('sq1-alpha').value),
+    sq2:  document.getElementById('sq2-color').value,
+    sq2A: parseInt(document.getElementById('sq2-alpha').value),
+    lm:   document.getElementById('lm-color').value,
+    lmA:  parseInt(document.getElementById('lm-alpha').value),
+    sel:  document.getElementById('sel-color').value,
+    selA: parseInt(document.getElementById('sel-alpha').value),
+    md:   document.getElementById('md-color').value,
+    mdA:  parseInt(document.getElementById('md-alpha').value),
+    mdMode: document.getElementById('md-mode').value,
+    oc:   document.getElementById('oc-color').value,
+    ocA:  parseInt(document.getElementById('oc-alpha').value),
+    pm:   document.getElementById('pm-color').value,
+    pmA:  parseInt(document.getElementById('pm-alpha').value),
+  };
+  container.querySelectorAll('.preset-item').forEach((item, i) => {
+    const p = list[i];
+    const match = p &&
+      cur.sq1 === p.sq1 && cur.sq1A === p.sq1A &&
+      cur.sq2 === p.sq2 && cur.sq2A === p.sq2A &&
+      cur.lm === p.lm && cur.lmA === p.lmA &&
+      cur.sel === p.sel && cur.selA === p.selA &&
+      cur.md === p.md && cur.mdA === p.mdA && cur.mdMode === p.mdMode &&
+      cur.oc === p.oc && cur.ocA === p.ocA &&
+      cur.pm === p.pm && cur.pmA === p.pmA;
+    item.classList.toggle('active', !!match);
+  });
+}
+
+function renderPresets(style) {
+  const container = document.getElementById('presets-grid');
+  container.innerHTML = '';
+  (PRESETS[style] || []).forEach(p => {
+    const item = document.createElement('div');
+    item.className = 'preset-item';
+
+    const thumb = document.createElement('div');
+    thumb.className = 'preset-thumb';
+    thumb.innerHTML =
+      `<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">` +
+      `<polygon points="0,0 0,48 48,0" fill="${p.sq1}"/>` +
+      `<polygon points="0,48 48,48 48,0" fill="${p.sq2}"/>` +
+      `</svg>`;
+
+    const name = document.createElement('div');
+    name.className = 'preset-name';
+    name.textContent = p.name;
+
+    item.appendChild(thumb);
+    item.appendChild(name);
+
+    item.addEventListener('click', () => {
+      applyPreset(p);
+      syncPresetHighlight();
+    });
+
+    container.appendChild(item);
+  });
+  syncPresetHighlight();
+}
+
+wireOverlay('sq1');
+wireOverlay('sq2');
+wireOverlay('lm');
+wireOverlay('sel');
+wireOverlay('md');
+wireOverlay('oc');
+wireOverlay('pm');
+
+document.getElementById('md-mode').addEventListener('change', () => { update(); syncPresetHighlight(); });
+
+renderPresets('duo');
+loadFromParams();
+
+document.getElementById('install-btn').addEventListener('click', () => {
+  window.open(`/style.user.css?${buildStyleParams()}`, '_blank');
+});
+
+function buildStyleParams() {
+  return new URLSearchParams({
+    sq1:    document.getElementById('sq1-color').value.slice(1),
+    sq1a:   document.getElementById('sq1-alpha').value,
+    sq2:    document.getElementById('sq2-color').value.slice(1),
+    sq2a:   document.getElementById('sq2-alpha').value,
+    lm:     document.getElementById('lm-color').value.slice(1),
+    lma:    document.getElementById('lm-alpha').value,
+    sel:    document.getElementById('sel-color').value.slice(1),
+    sela:   document.getElementById('sel-alpha').value,
+    md:     document.getElementById('md-color').value.slice(1),
+    mda:    document.getElementById('md-alpha').value,
+    mdmode: document.getElementById('md-mode').value,
+    oc:     document.getElementById('oc-color').value.slice(1),
+    oca:    document.getElementById('oc-alpha').value,
+    pm:     document.getElementById('pm-color').value.slice(1),
+    pma:    document.getElementById('pm-alpha').value,
+  });
+}
+
+function loadFromParams() {
+  const p = new URLSearchParams(window.location.search);
+  if (!p.has('sq1')) return;
+  const hex = (key, def) => {
+    const v = p.get(key) || '';
+    return '#' + (/^[0-9a-fA-F]{6}$/.test(v) ? v : def);
+  };
+  const alpha = (key, def) => {
+    const v = parseInt(p.get(key));
+    return isNaN(v) ? def : Math.max(0, Math.min(100, v));
+  };
+  applyPreset({
+    sq1: hex('sq1', 'edd6b0'), sq1A: alpha('sq1a', 100),
+    sq2: hex('sq2', 'b88762'), sq2A: alpha('sq2a', 100),
+    lm:  hex('lm',  'f6eb72'), lmA:  alpha('lma',  60),
+    sel: hex('sel', '5aa7cc'), selA: alpha('sela', 60),
+    md:  hex('md',  '573017'), mdA:  alpha('mda',  60),
+    mdMode: ['dot', 'square'].includes(p.get('mdmode')) ? p.get('mdmode') : 'dot',
+    oc:  hex('oc',  'ff7d7d'), ocA:  alpha('oca',  60),
+    pm:  hex('pm',  'bb37bc'), pmA:  alpha('pma',  60),
+  });
+  syncPresetHighlight();
+  history.replaceState(null, '', location.pathname);
+}
+
+document.getElementById('download-btn').addEventListener('click', () => {
+  const css = document.getElementById('css-out').value;
+  const blob = new Blob([css], { type: 'text/css' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'lichess-tailor.user.css';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+});
+
+const SHARE_SVG = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`;
+
+document.getElementById('share-btn').addEventListener('click', async () => {
+  const btn = document.getElementById('share-btn');
+  const url = `${location.origin}${location.pathname}?${buildStyleParams()}`;
+  try {
+    await navigator.clipboard.writeText(url);
+  } catch {
+    const ta = document.createElement('textarea');
+    ta.value = url;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
+  btn.innerHTML = '✓ Link copied!';
+  btn.classList.add('ok');
+  setTimeout(() => {
+    btn.innerHTML = SHARE_SVG + ' Share';
+    btn.classList.remove('ok');
+  }, 2000);
+});
+
+const COPY_SVG = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+
+document.getElementById('copy-btn').addEventListener('click', async () => {
+  const btn  = document.getElementById('copy-btn');
+  const text = document.getElementById('css-out').value;
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    const ta = document.getElementById('css-out');
+    ta.select();
+    document.execCommand('copy');
+  }
+  btn.innerHTML = '✓ Copied!';
+  btn.classList.add('ok');
+  setTimeout(() => {
+    btn.innerHTML = COPY_SVG + ' Copy CSS';
+    btn.classList.remove('ok');
+  }, 2000);
+});
+
+const infoBtn     = document.getElementById('info-btn');
+const infoPopover = document.getElementById('info-popover');
+
+function positionInfoPopover() {
+  const rect    = infoBtn.getBoundingClientRect();
+  const popW    = 290;
+  const margin  = 8;
+  const rawLeft = rect.left + rect.width / 2;
+  const clamped = Math.max(popW / 2 + margin, Math.min(window.innerWidth - popW / 2 - margin, rawLeft));
+  // Shift the arrow so it always points back at the button
+  const arrowLeft = Math.max(14, Math.min(popW - 14, rawLeft - clamped + popW / 2));
+  infoPopover.style.top  = (rect.bottom + 10) + 'px';
+  infoPopover.style.left = clamped + 'px';
+  infoPopover.style.setProperty('--arrow-left', arrowLeft + 'px');
+}
+
+infoBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  if (infoPopover.hidden) {
+    positionInfoPopover();
+    infoPopover.hidden = false;
+  } else {
+    infoPopover.hidden = true;
+  }
+});
+document.getElementById('info-popover-close').addEventListener('click', e => {
+  e.stopPropagation();
+  infoPopover.hidden = true;
+});
+infoPopover.addEventListener('click', e => e.stopPropagation());
+document.addEventListener('click', () => { infoPopover.hidden = true; });
+window.addEventListener('scroll', () => {
+  if (!infoPopover.hidden) positionInfoPopover();
+}, { passive: true });
+window.addEventListener('resize', () => {
+  if (!infoPopover.hidden) positionInfoPopover();
+}, { passive: true });
+
+update();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<script type="module">
+import { Chessground } from 'https://cdn.jsdelivr.net/npm/@lichess-org/chessground@10.1.1/+esm';
+import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1.1.0/+esm';
+
+const chess = new Chess();
+let blackMoveTimer = null;
+let countdownInterval = null;
+let cg;
+
+function setTurnIndicator(color, countdownMs) {
+  const dot  = document.getElementById('turn-dot');
+  const text = document.getElementById('turn-text');
+  clearInterval(countdownInterval);
+  if (color === 'white') {
+    dot.className = 'turn-dot white';
+    text.textContent = 'White to move';
+  } else if (color === 'black') {
+    dot.className = 'turn-dot black';
+    const end = Date.now() + countdownMs;
+    const tick = () => {
+      const secs = Math.max(0, (end - Date.now()) / 1000).toFixed(1);
+      text.textContent = `Black automoves in ${secs}s`;
+    };
+    tick();
+    countdownInterval = setInterval(tick, 100);
+  } else if (color === 'white_wins') {
+    dot.className = 'turn-dot white';
+    text.textContent = 'White wins by checkmate (1-0)';
+  }
+}
+
+let confettiInterval = null;
+
+function launchConfetti() {
+  const duration = 5 * 1000;
+  const animationEnd = Date.now() + duration;
+  const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+  const randomInRange = (min, max) => Math.random() * (max - min) + min;
+
+  confettiInterval = setInterval(() => {
+    const timeLeft = animationEnd - Date.now();
+    if (timeLeft <= 0) {
+      clearInterval(confettiInterval);
+      return;
+    }
+    const particleCount = 50 * (timeLeft / duration);
+    confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+    confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+  }, 250);
+}
+
+function toDests() {
+  const dests = new Map();
+  chess.moves({ verbose: true }).forEach(m => {
+    if (!dests.has(m.from)) dests.set(m.from, []);
+    dests.get(m.from).push(m.to);
+  });
+  return dests;
+}
+
+// Always rebuild the full movable config so events.after is never dropped
+// by a partial cg.set() merge and dests are always fresh.
+function whiteMovable() {
+  return {
+    color: 'white',
+    free: false,
+    dests: toDests(),
+    events: { after: onWhiteMove }
+  };
+}
+
+function onWhiteMove(orig, dest) {
+  const piece = chess.get(orig);
+  const isPromo = piece?.type === 'p' && (dest[1] === '8' || dest[1] === '1');
+  try {
+    chess.move({ from: orig, to: dest, ...(isPromo ? { promotion: 'q' } : {}) });
+  } catch {
+    // Premove was illegal after black's response — snap back to real position
+    cg.set({ fen: chess.fen(), turnColor: 'white', movable: whiteMovable() });
+    setTurnIndicator('white');
+    return;
+  }
+  if (isPromo) {
+    cg.setPieces(new Map([[dest, { role: 'queen', color: 'white', promoted: true }]]));
+  }
+  // Flip turn to black — chessground blocks normal moves but allows white to queue a premove
+  cg.set({ turnColor: 'black' });
+  scheduleBlack();
+}
+
+function scheduleBlack() {
+  clearTimeout(blackMoveTimer);
+  if (chess.isGameOver()) {
+    if (chess.isCheckmate()) {
+      setTurnIndicator('white_wins');
+      launchConfetti();
+    }
+    return;
+  }
+  setTurnIndicator('black', 5000);
+  blackMoveTimer = setTimeout(() => {
+    const moves = chess.moves({ verbose: true });
+    if (!moves.length) return;
+    const m = moves[Math.floor(Math.random() * moves.length)];
+    chess.move(m);
+    // Animate black's move — cg.move() preserves premovable.current unlike cg.set({ fen })
+    cg.move(m.from, m.to);
+    // En passant: captured pawn sits beside dest, not on it — cg.move() won't remove it
+    if (m.flags.includes('e')) {
+      cg.setPieces(new Map([[m.to[0] + m.from[1], undefined]]));
+    }
+    // Re-enable white — if a premove is queued it fires onWhiteMove which calls scheduleBlack
+    setTurnIndicator('white');
+    cg.set({
+      turnColor: 'white',
+      movable: chess.isGameOver() ? { color: 'none' } : whiteMovable()
+    });
+    // Execute the queued premove if it's still legal
+    cg.playPremove();
+  }, 5000);
+}
+
+cg = Chessground(document.getElementById('board-wrap'), {
+  fen: chess.fen(),
+  turnColor: 'white',
+  movable: whiteMovable(),
+  premovable: {
+    enabled: true,
+    showDests: true,
+  },
+  highlight: { lastMove: true, check: true }
+});
+setTurnIndicator('white');
+
+document.getElementById('reset-btn').addEventListener('click', () => {
+  clearTimeout(blackMoveTimer);
+  clearInterval(countdownInterval);
+  clearInterval(confettiInterval);
+  confetti.reset();
+  chess.reset();
+  cg.set({
+    fen: chess.fen(),
+    turnColor: 'white',
+    lastMove: undefined,
+    movable: whiteMovable()
+  });
+  setTurnIndicator('white');
+});
+</script>
+</body>
+</html>
