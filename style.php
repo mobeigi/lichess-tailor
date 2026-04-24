@@ -63,20 +63,18 @@ function makeTexturePattern(string $patId, string $txId, int $alphaPercent, stri
     }
     $scale = number_format(1 / $viewBoxSize, 10, '.', '');
 
-    // Strip the outer <svg> wrapper, then remove all inline fill/stroke colour
-    // attributes from child elements (preserving fill="none" which is structural).
-    // The wrapper <g> sets fill and stroke to the chosen colour so every element
-    // inherits it, making the colour picker work for any SVG.
+    // Strip the outer <svg> wrapper, then replace all colour values (#000000,
+    // #000, black) with the user-chosen colour. fill="none" and stroke="none"
+    // are preserved as they are structural (not colour choices).
     $raw   = preg_replace('/<svg[^>]*>/', '', $svgSrc);
     $raw   = preg_replace('/<\/svg>\s*$/', '', $raw);
-    $raw   = preg_replace('/\s+fill="(?!none")[^"]*"/', '', $raw);
-    $raw   = preg_replace("/\\s+fill='(?!none')[^']*'/", '', $raw);
-    $raw   = preg_replace('/\s+stroke="(?!none")[^"]*"/', '', $raw);
-    $inner = preg_replace("/\\s+stroke='(?!none')[^']*'/", '', $raw);
+    $raw   = str_replace('#000000', "#{$colour}", $raw);
+    $raw   = preg_replace('/#000(?![0-9a-fA-F])/', "#{$colour}", $raw);
+    $inner = preg_replace('/(["\'])black\1/', "$1#{$colour}$1", $raw);
 
     return implode("\n", [
         "<pattern id=\"{$patId}\" x=\"0\" y=\"0\" width=\"1\" height=\"1\" patternUnits=\"userSpaceOnUse\">",
-        "  <g fill=\"#{$colour}\" stroke=\"#{$colour}\" opacity=\"{$opacity}\" transform=\"scale({$scale})\">",
+        "  <g opacity=\"{$opacity}\" transform=\"scale({$scale})\">",
         "    {$inner}",
         "  </g>",
         "</pattern>",
