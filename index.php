@@ -290,6 +290,7 @@
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
+      height: 100%;
     }
 
     .sidebar {
@@ -381,8 +382,9 @@
 
     textarea#css-out {
       width: 100%;
-      height: 100px;
-      resize: vertical;
+      flex: 1;
+      min-height: 100px;
+      resize: none;
       background: #0b0e16;
       color: #7dd3fc;
       border: 1px solid var(--border);
