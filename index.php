@@ -617,7 +617,7 @@
           <div class="info-popover-title">How to use</div>
           <ol>
             <li>Install a User Style extension (recommended is Stylus for <a href="https://chromewebstore.google.com/detail/stylus/clngdbkpkpeebahjckkjfobafhncgmne" target="_blank" rel="external">Chrome</a> or <a href="https://addons.mozilla.org/firefox/addon/styl-us/" target="_blank" rel="external">Firefox</a>).</li>
-            <li>Customise your board colours and overlays using the controls.</li>
+            <li>Customise your board colours, overlays and textures.</li>
             <li>Click <strong>Install</strong> on the Generated User Style card to apply on lichess.org.</li>
           </ol>
           <div class="info-popover-footer">See also: <a href="https://lichess.org/page/userstyles" target="_blank" rel="external">Lichess user styles guide</a></div>
