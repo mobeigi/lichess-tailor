@@ -796,6 +796,58 @@
             </div>
           </div>
 
+          <!-- Divider -->
+          <div class="col-divider">
+            <span class="col-divider-label">Textures</span>
+            <div class="col-divider-line"></div>
+          </div>
+
+          <!-- Light Square Texture -->
+          <div class="ov-item">
+            <div class="ov-head">
+              <span class="ov-name">Light Squares</span>
+              <select class="ov-mode" id="tx1-type">
+                <option value="none">None</option>
+                <option value="horizontal">Horizontal</option>
+                <option value="vertical">Vertical</option>
+                <option value="diagonal">Diagonal</option>
+                <option value="waves">Waves</option>
+              </select>
+            </div>
+            <div class="color-row">
+              <div class="swatch" id="tx1-sw"><input type="color" id="tx1-color" value="#000000"></div>
+              <input type="text" class="hex-in" id="tx1-hex" value="#000000" maxlength="7" spellcheck="false">
+            </div>
+            <div class="ov-alpha-row">
+              <span class="alpha-lbl">α</span>
+              <input type="range" class="alpha-slider" id="tx1-alpha" min="0" max="100" value="10">
+              <span class="alpha-val" id="tx1-alpha-val">10%</span>
+            </div>
+          </div>
+
+          <!-- Dark Square Texture -->
+          <div class="ov-item">
+            <div class="ov-head">
+              <span class="ov-name">Dark Squares</span>
+              <select class="ov-mode" id="tx2-type">
+                <option value="none">None</option>
+                <option value="horizontal">Horizontal</option>
+                <option value="vertical">Vertical</option>
+                <option value="diagonal">Diagonal</option>
+                <option value="waves">Waves</option>
+              </select>
+            </div>
+            <div class="color-row">
+              <div class="swatch" id="tx2-sw"><input type="color" id="tx2-color" value="#000000"></div>
+              <input type="text" class="hex-in" id="tx2-hex" value="#000000" maxlength="7" spellcheck="false">
+            </div>
+            <div class="ov-alpha-row">
+              <span class="alpha-lbl">α</span>
+              <input type="range" class="alpha-slider" id="tx2-alpha" min="0" max="100" value="10">
+              <span class="alpha-val" id="tx2-alpha-val">10%</span>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -816,18 +868,84 @@
 
 <script>
 
-function makeSVG(c1, c2) {
+// ── Texture registry ────────────────────────────────────────────────────────
+// Each entry is a complete SVG string (viewBox="0 0 64 64") using #000000 for
+// all stroke/fill colours. The <svg> wrapper is stripped at render time and
+// the colour replaced with the user's chosen colour.
+// To add a new texture: paste its SVG here as a string — no other changes needed.
+const TEXTURES = {
+  horizontal: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><g transform="rotate(90 32 32) translate(0 0)"><path d="M4 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM12 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM20 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM28 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM36 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM44 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM52 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM60 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1z" fill="#000000"/></g></svg>',
+  vertical:   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><g><path d="M4 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM12 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM20 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM28 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM36 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM44 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM52 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM60 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1z" fill="#000000"/></g></svg>',
+  diagonal:   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><g><path d="M4 15.51a1 1 0 0 0 .71-.29L15.22 4.71a1 1 0 1 0-1.42-1.42L3.29 13.8a1 1 0 0 0 0 1.42 1 1 0 0 0 .71.29zM4 26.89a1 1 0 0 0 .71-.29L26.6 4.71a1 1 0 1 0-1.42-1.42L3.29 25.18a1 1 0 0 0 0 1.42 1 1 0 0 0 .71.29zM4 38.25a1 1 0 0 0 .71-.25L38 4.71a1 1 0 1 0-1.42-1.42L3.29 36.54a1 1 0 0 0 0 1.42 1 1 0 0 0 .71.29zM4 49.63a1 1 0 0 0 .71-.29L49.34 4.71a1 1 0 1 0-1.42-1.42L3.29 47.92a1 1 0 0 0 0 1.42 1 1 0 0 0 .71.29zM60.71 3.29a1 1 0 0 0-1.42 0l-56 56a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l56-56a1 1 0 0 0 0-1.42zM59.29 14.66 14.66 59.29a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l44.63-44.63a1 1 0 0 0-1.42-1.42zM59.29 26 26 59.29a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l33.29-33.25A1 1 0 0 0 59.29 26zM59.29 37.4 37.4 59.29a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l21.89-21.89a1 1 0 0 0-1.42-1.42zM59.29 48.78 48.78 59.29a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0L60.71 50.2a1 1 0 0 0-1.42-1.42z" fill="#000000"/></g></svg>',
+  waves:      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><g fill="none" stroke="#000000" stroke-width="2"><path d="M4 5c1.73 0 2.59 1.06 3.85 2.8s2.64 3.62 5.48 3.62S17.57 9.5 18.8 7.8 20.92 5 22.66 5s2.6 1.06 3.86 2.8 2.63 3.62 5.47 3.62 4.24-1.92 5.48-3.62S39.59 5 41.32 5s2.6 1.06 3.87 2.8 2.63 3.62 5.47 3.62 4.25-1.92 5.48-3.62S58.26 5 60 5"/><path d="M4 17.39c1.73 0 2.59 1.07 3.85 2.8s2.64 3.63 5.48 3.63 4.24-1.93 5.47-3.63 2.12-2.8 3.86-2.8 2.6 1.07 3.86 2.8 2.63 3.63 5.47 3.63 4.24-1.93 5.48-3.63 2.12-2.8 3.85-2.8 2.6 1.07 3.87 2.8 2.63 3.63 5.47 3.63 4.25-1.93 5.48-3.63 2.12-2.8 3.86-2.8"/><path d="M4 29.79c1.73 0 2.59 1.06 3.85 2.8s2.64 3.62 5.48 3.62 4.24-1.92 5.47-3.62 2.12-2.8 3.86-2.8 2.6 1.06 3.86 2.8 2.63 3.62 5.47 3.62 4.24-1.92 5.48-3.62 2.12-2.8 3.85-2.8 2.6 1.06 3.87 2.8 2.63 3.62 5.47 3.62 4.25-1.92 5.48-3.62 2.12-2.8 3.86-2.8"/><path d="M4 42.18c1.73 0 2.59 1.07 3.85 2.8s2.64 3.63 5.48 3.63 4.24-1.93 5.47-3.63 2.12-2.8 3.86-2.8 2.6 1.07 3.86 2.8 2.63 3.63 5.47 3.63 4.24-1.93 5.48-3.63 2.12-2.8 3.85-2.8 2.6 1.07 3.87 2.8 2.63 3.63 5.47 3.63 4.25-1.93 5.48-3.63 2.12-2.8 3.86-2.8"/><path d="M4 54.58c1.73 0 2.59 1.06 3.85 2.8s2.64 3.62 5.48 3.62 4.24-1.92 5.47-3.62 2.12-2.8 3.86-2.8 2.6 1.06 3.86 2.8 2.63 3.62 5.47 3.62 4.24-1.92 5.48-3.62 2.12-2.8 3.85-2.8 2.6 1.06 3.87 2.8 2.63 3.62 5.47 3.62 4.25-1.92 5.48-3.62 2.12-2.8 3.86-2.8"/></g></svg>',
+};
+
+// Build the texture <pattern> block for one square type.
+// patId: 'tp1' or 'tp2', sqSize: SVG units per square (1 in our 8×8 viewBox).
+// The texture SVG paths are scaled from 64×64 to sqSize×sqSize via a transform.
+// colour: a CSS hex colour string (e.g. '#000000') applied to stroke and fill.
+function makeTexturePattern(patId, txId, alphaPercent, sqSize, colour) {
+  if (txId === 'none' || !TEXTURES[txId]) return '';
+  const opacity = parseFloat((alphaPercent / 100).toFixed(2));
+  const scale   = sqSize / 64;   // scale factor from the 64×64 texture viewBox to 1 SVG unit
+  // Strip the outer <svg> wrapper, then replace all black colour references
+  // (#000000, #000, or the keyword "black" as an attribute value) with the
+  // user-chosen colour. This makes the registry work for any well-formed SVG.
+  const inner = TEXTURES[txId]
+    .replace(/^<svg[^>]*>/, '')
+    .replace(/<\/svg>\s*$/, '')
+    .replace(/#000000/g, colour)
+    .replace(/#000(?![0-9a-fA-F])/g, colour)
+    .replace(/(["'])black\1/g, `$1${colour}$1`);
+  return [
+    `<pattern id="${patId}" x="0" y="0" width="${sqSize}" height="${sqSize}"`,
+    `         patternUnits="userSpaceOnUse">`,
+    `  <g opacity="${opacity}" transform="scale(${scale})">`,
+    inner,
+    `  </g>`,
+    `</pattern>`,
+  ].join('\n');
+}
+
+function makeSVG(c1, c2, tx1Id = 'none', tx1Alpha = 10, tx1Colour = '#000000', tx2Id = 'none', tx2Alpha = 10, tx2Colour = '#000000') {
+  const sqSize = 1; // each square is 1 unit in the 8×8 viewBox
+  const pat1 = makeTexturePattern('tp1', tx1Id, tx1Alpha, sqSize, tx1Colour);
+  const pat2 = makeTexturePattern('tp2', tx2Id, tx2Alpha, sqSize, tx2Colour);
+  const hasTex1 = pat1 !== '';
+  const hasTex2 = pat2 !== '';
+
+  // The fill for each square: solid colour rect + optional texture rect on top.
+  // When a texture is active we wrap both rects in a <g id="e/f"> so that
+  // the existing <use> elements clone the whole group (colour + texture).
+  const sq1Fill = hasTex1
+    ? [`        <g id="e">`,
+       `          <rect width="1" height="1" fill="${c1}"/>`,
+       `          <rect width="1" height="1" fill="url(#tp1)"/>`,
+       `        </g>`].join('\n')
+    : `        <rect width="1" height="1" id="e" fill="${c1}"/>`;
+  const sq2Fill = hasTex2
+    ? [`        <g id="f">`,
+       `          <rect y="1" width="1" height="1" fill="${c2}"/>`,
+       `          <rect y="1" width="1" height="1" fill="url(#tp2)"/>`,
+       `        </g>`].join('\n')
+    : `        <rect y="1" width="1" height="1" id="f" fill="${c2}"/>`;
+
+  const defs = (pat1 || pat2)
+    ? `<defs>\n${[pat1, pat2].filter(Boolean).join('\n')}\n</defs>`
+    : '';
+
   return [
     '<?xml version="1.0" encoding="UTF-8" standalone="no"?>',
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:x="http://www.w3.org/1999/xlink"',
     '     viewBox="0 0 8 8" shape-rendering="crispEdges">',
+    defs,
     '<g id="a">',
     '  <g id="b">',
     '    <g id="c">',
     '      <g id="d">',
-    `        <rect width="1" height="1" id="e" fill="${c1}"/>`,
+    sq1Fill,
     '        <use x="1" y="1" href="#e" x:href="#e"/>',
-    `        <rect y="1" width="1" height="1" id="f" fill="${c2}"/>`,
+    sq2Fill,
     '        <use x="1" y="-1" href="#f" x:href="#f"/>',
     '      </g>',
     '      <use x="2" href="#d" x:href="#d"/>',
@@ -838,7 +956,7 @@ function makeSVG(c1, c2) {
     '</g>',
     '<use y="4" href="#a" x:href="#a"/>',
     '</svg>'
-  ].join('\n');
+  ].filter(s => s !== '').join('\n');
 }
 
 function toRgba(hex, alphaPercent) {
@@ -857,7 +975,14 @@ function ovRgba(prefix) {
 }
 
 function generateCSS(c1rgba, c2rgba) {
-  const b64 = btoa(makeSVG(c1rgba, c2rgba));
+  const tx1Type   = document.getElementById('tx1-type').value;
+  const tx1Alpha  = parseInt(document.getElementById('tx1-alpha').value);
+  const tx1Colour = document.getElementById('tx1-color').value;
+  const tx2Type   = document.getElementById('tx2-type').value;
+  const tx2Alpha  = parseInt(document.getElementById('tx2-alpha').value);
+  const tx2Colour = document.getElementById('tx2-color').value;
+
+  const b64 = btoa(makeSVG(c1rgba, c2rgba, tx1Type, tx1Alpha, tx1Colour, tx2Type, tx2Alpha, tx2Colour));
   const lmRgba  = ovRgba('lm');
   const selRgba = ovRgba('sel');
   const mdRgba  = ovRgba('md');
@@ -1067,6 +1192,32 @@ function applyPreset(p) {
   setOverlay('oc',  p.oc,  p.ocA);
   setOverlay('pm',  p.pm,  p.pmA);
   if (p.mdMode) document.getElementById('md-mode').value = p.mdMode;
+  // Textures — only apply if present in the preset object
+  ['tx1', 'tx2'].forEach(prefix => {
+    const typeKey  = prefix;         // e.g. 'tx1'
+    const alphaKey = prefix + 'A';   // e.g. 'tx1A'
+    const colKey   = prefix + 'C';   // e.g. 'tx1C'
+    if (p[typeKey] !== undefined) {
+      document.getElementById(`${prefix}-type`).value = p[typeKey];
+    }
+    if (p[colKey] !== undefined) {
+      const picker = document.getElementById(`${prefix}-color`);
+      const hexIn  = document.getElementById(`${prefix}-hex`);
+      const swatch = document.getElementById(`${prefix}-sw`);
+      const slider = document.getElementById(`${prefix}-alpha`);
+      picker.value = p[colKey];
+      hexIn.value  = p[colKey];
+      hexIn.classList.remove('bad');
+      swatch.style.background = p[colKey];
+      setSliderGradient(slider, p[colKey]);
+    }
+    if (p[alphaKey] !== undefined) {
+      const slider = document.getElementById(`${prefix}-alpha`);
+      const valEl  = document.getElementById(`${prefix}-alpha-val`);
+      slider.value = p[alphaKey];
+      valEl.textContent = p[alphaKey] + '%';
+    }
+  });
   update();
 }
 
@@ -1148,6 +1299,50 @@ wireOverlay('pm');
 
 document.getElementById('md-mode').addEventListener('change', () => { update(); syncPresetHighlight(); });
 
+// Wire texture controls (type select + colour picker + hex input + alpha slider)
+(function wireTextures() {
+  ['tx1', 'tx2'].forEach(prefix => {
+    const sel    = document.getElementById(`${prefix}-type`);
+    const picker = document.getElementById(`${prefix}-color`);
+    const hexIn  = document.getElementById(`${prefix}-hex`);
+    const swatch = document.getElementById(`${prefix}-sw`);
+    const slider = document.getElementById(`${prefix}-alpha`);
+    const valEl  = document.getElementById(`${prefix}-alpha-val`);
+
+    // Initialise swatch and slider gradient from the default colour
+    swatch.style.background = picker.value;
+    setSliderGradient(slider, picker.value);
+
+    sel.addEventListener('change', () => { update(); });
+
+    picker.addEventListener('input', () => {
+      hexIn.value = picker.value;
+      hexIn.classList.remove('bad');
+      swatch.style.background = picker.value;
+      setSliderGradient(slider, picker.value);
+      update();
+    });
+
+    hexIn.addEventListener('input', () => {
+      const v = hexIn.value.trim();
+      if (/^#[0-9A-Fa-f]{6}$/.test(v)) {
+        picker.value = v;
+        hexIn.classList.remove('bad');
+        swatch.style.background = v;
+        setSliderGradient(slider, v);
+        update();
+      } else {
+        hexIn.classList.add('bad');
+      }
+    });
+
+    slider.addEventListener('input', () => {
+      valEl.textContent = slider.value + '%';
+      update();
+    });
+  });
+})();
+
 renderPresets('duo');
 loadFromParams();
 
@@ -1172,6 +1367,12 @@ function buildStyleParams() {
     oca:    document.getElementById('oc-alpha').value,
     pm:     document.getElementById('pm-color').value.slice(1),
     pma:    document.getElementById('pm-alpha').value,
+    tx1:    document.getElementById('tx1-type').value,
+    tx1a:   document.getElementById('tx1-alpha').value,
+    tx1c:   document.getElementById('tx1-color').value.slice(1),
+    tx2:    document.getElementById('tx2-type').value,
+    tx2a:   document.getElementById('tx2-alpha').value,
+    tx2c:   document.getElementById('tx2-color').value.slice(1),
   });
 }
 
@@ -1186,6 +1387,11 @@ function loadFromParams() {
     const v = parseInt(p.get(key));
     return isNaN(v) ? def : Math.max(0, Math.min(100, v));
   };
+  const VALID_TEXTURES = ['none', ...Object.keys(TEXTURES)];
+  const texture = (key, def) => {
+    const v = p.get(key) || '';
+    return VALID_TEXTURES.includes(v) ? v : def;
+  };
   applyPreset({
     sq1: hex('sq1', 'edd6b0'), sq1A: alpha('sq1a', 100),
     sq2: hex('sq2', 'b88762'), sq2A: alpha('sq2a', 100),
@@ -1195,6 +1401,8 @@ function loadFromParams() {
     mdMode: ['dot', 'square'].includes(p.get('mdmode')) ? p.get('mdmode') : 'dot',
     oc:  hex('oc',  'ff7d7d'), ocA:  alpha('oca',  60),
     pm:  hex('pm',  'bb37bc'), pmA:  alpha('pma',  60),
+    tx1: texture('tx1', 'none'), tx1A: alpha('tx1a', 10), tx1C: hex('tx1c', '000000'),
+    tx2: texture('tx2', 'none'), tx2A: alpha('tx2a', 10), tx2C: hex('tx2c', '000000'),
   });
   syncPresetHighlight();
   history.replaceState(null, '', location.pathname);

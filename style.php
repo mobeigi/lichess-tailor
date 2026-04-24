@@ -26,6 +26,58 @@ function toRgba(string $hex, int $alpha): string
     return "rgba($r, $g, $b, $a)";
 }
 
+// Texture registry — complete SVG strings (viewBox="0 0 64 64") using #000000.
+// The <svg> wrapper is stripped at render time and the colour substituted.
+// To add a new texture: add an entry here and an <option> in style.user.css params.
+const TEXTURE_PATHS = [
+    'horizontal' =>
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">' .
+        '<g transform="rotate(90 32 32) translate(0 0)">' .
+        '<path d="M4 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM12 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM20 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM28 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM36 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM44 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM52 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM60 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1z" fill="#000000"/>' .
+        '</g></svg>',
+    'vertical' =>
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">' .
+        '<g>' .
+        '<path d="M4 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM12 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM20 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM28 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM36 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM44 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM52 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM60 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1z" fill="#000000"/>' .
+        '</g></svg>',
+    'diagonal' =>
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">' .
+        '<g>' .
+        '<path d="M4 15.51a1 1 0 0 0 .71-.29L15.22 4.71a1 1 0 1 0-1.42-1.42L3.29 13.8a1 1 0 0 0 0 1.42 1 1 0 0 0 .71.29zM4 26.89a1 1 0 0 0 .71-.29L26.6 4.71a1 1 0 1 0-1.42-1.42L3.29 25.18a1 1 0 0 0 0 1.42 1 1 0 0 0 .71.29zM4 38.25a1 1 0 0 0 .71-.25L38 4.71a1 1 0 1 0-1.42-1.42L3.29 36.54a1 1 0 0 0 0 1.42 1 1 0 0 0 .71.29zM4 49.63a1 1 0 0 0 .71-.29L49.34 4.71a1 1 0 1 0-1.42-1.42L3.29 47.92a1 1 0 0 0 0 1.42 1 1 0 0 0 .71.29zM60.71 3.29a1 1 0 0 0-1.42 0l-56 56a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l56-56a1 1 0 0 0 0-1.42zM59.29 14.66 14.66 59.29a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l44.63-44.63a1 1 0 0 0-1.42-1.42zM59.29 26 26 59.29a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l33.29-33.25A1 1 0 0 0 59.29 26zM59.29 37.4 37.4 59.29a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l21.89-21.89a1 1 0 0 0-1.42-1.42zM59.29 48.78 48.78 59.29a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0L60.71 50.2a1 1 0 0 0-1.42-1.42z" fill="#000000"/>' .
+        '</g></svg>',
+    'waves' =>
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">' .
+        '<g fill="none" stroke="#000000" stroke-width="2">' .
+        '<path d="M4 5c1.73 0 2.59 1.06 3.85 2.8s2.64 3.62 5.48 3.62S17.57 9.5 18.8 7.8 20.92 5 22.66 5s2.6 1.06 3.86 2.8 2.63 3.62 5.47 3.62 4.24-1.92 5.48-3.62S39.59 5 41.32 5s2.6 1.06 3.87 2.8 2.63 3.62 5.47 3.62 4.25-1.92 5.48-3.62S58.26 5 60 5"/>' .
+        '<path d="M4 17.39c1.73 0 2.59 1.07 3.85 2.8s2.64 3.63 5.48 3.63 4.24-1.93 5.47-3.63 2.12-2.8 3.86-2.8 2.6 1.07 3.86 2.8 2.63 3.63 5.47 3.63 4.24-1.93 5.48-3.63 2.12-2.8 3.85-2.8 2.6 1.07 3.87 2.8 2.63 3.63 5.47 3.63 4.25-1.93 5.48-3.63 2.12-2.8 3.86-2.8"/>' .
+        '<path d="M4 29.79c1.73 0 2.59 1.06 3.85 2.8s2.64 3.62 5.48 3.62 4.24-1.92 5.47-3.62 2.12-2.8 3.86-2.8 2.6 1.06 3.86 2.8 2.63 3.62 5.47 3.62 4.24-1.92 5.48-3.62 2.12-2.8 3.85-2.8 2.6 1.06 3.87 2.8 2.63 3.62 5.47 3.62 4.25-1.92 5.48-3.62 2.12-2.8 3.86-2.8"/>' .
+        '<path d="M4 42.18c1.73 0 2.59 1.07 3.85 2.8s2.64 3.63 5.48 3.63 4.24-1.93 5.47-3.63 2.12-2.8 3.86-2.8 2.6 1.07 3.86 2.8 2.63 3.63 5.47 3.63 4.24-1.93 5.48-3.63 2.12-2.8 3.85-2.8 2.6 1.07 3.87 2.8 2.63 3.63 5.47 3.63 4.25-1.93 5.48-3.63 2.12-2.8 3.86-2.8"/>' .
+        '<path d="M4 54.58c1.73 0 2.59 1.06 3.85 2.8s2.64 3.62 5.48 3.62 4.24-1.92 5.47-3.62 2.12-2.8 3.86-2.8 2.6 1.06 3.86 2.8 2.63 3.62 5.47 3.62 4.24-1.92 5.48-3.62 2.12-2.8 3.85-2.8 2.6 1.06 3.87 2.8 2.63 3.62 5.47 3.62 4.25-1.92 5.48-3.62 2.12-2.8 3.86-2.8"/>' .
+        '</g></svg>',
+];
+
+function makeTexturePattern(string $patId, string $txId, int $alphaPercent, string $colour): string
+{
+    if ($txId === 'none' || !isset(TEXTURE_PATHS[$txId])) return '';
+    $opacity = number_format($alphaPercent / 100, 2, '.', '');
+    $scale   = '0.015625'; // 1/64 — scale from 64×64 viewBox to 1 SVG unit
+    // Strip the outer <svg> wrapper then replace all black colour references
+    // (#000000, #000, or the keyword "black" as an attribute value) with the
+    // user-chosen colour. This makes the registry work for any well-formed SVG.
+    $raw   = preg_replace('/<svg[^>]*>/', '', TEXTURE_PATHS[$txId]);
+    $raw   = preg_replace('/<\/svg>\s*$/', '', $raw);
+    $raw   = str_replace('#000000', "#{$colour}", $raw);
+    $raw   = preg_replace('/#000(?![0-9a-fA-F])/', "#{$colour}", $raw);
+    $inner = preg_replace('/(["\'])black\1/', "$1#{$colour}$1", $raw);
+    return implode("\n", [
+        "<pattern id=\"{$patId}\" x=\"0\" y=\"0\" width=\"1\" height=\"1\" patternUnits=\"userSpaceOnUse\">",
+        "  <g opacity=\"{$opacity}\" transform=\"scale({$scale})\">",
+        "    {$inner}",
+        "  </g>",
+        "</pattern>",
+    ]);
+}
+
 // Parse and validate inputs — defaults match the Walnut preset
 $sq1    = validateHex  ($_GET['sq1']    ?? 'edd6b0', 'edd6b0');
 $sq1a   = validateAlpha($_GET['sq1a']   ?? 100,       100);
@@ -45,6 +97,14 @@ $oca    = validateAlpha($_GET['oca']    ?? 60,        60);
 $pm     = validateHex  ($_GET['pm']     ?? 'bb37bc', 'bb37bc');
 $pma    = validateAlpha($_GET['pma']    ?? 60,        60);
 
+$validTextures = array_merge(['none'], array_keys(TEXTURE_PATHS));
+$tx1    = in_array($_GET['tx1'] ?? '', $validTextures, true) ? $_GET['tx1'] : 'none';
+$tx1a   = validateAlpha($_GET['tx1a']   ?? 10,         10);
+$tx1c   = validateHex  ($_GET['tx1c']   ?? '000000', '000000');
+$tx2    = in_array($_GET['tx2'] ?? '', $validTextures, true) ? $_GET['tx2'] : 'none';
+$tx2a   = validateAlpha($_GET['tx2a']   ?? 10,         10);
+$tx2c   = validateHex  ($_GET['tx2c']   ?? '000000', '000000');
+
 // Convert to rgba strings
 $sq1rgba = toRgba($sq1, $sq1a);
 $sq2rgba = toRgba($sq2, $sq2a);
@@ -54,18 +114,39 @@ $mdRgba  = toRgba($md,   $mda);
 $ocRgba  = toRgba($oc,   $oca);
 $pmRgba  = toRgba($pm,   $pma);
 
+// Build texture patterns
+$pat1 = makeTexturePattern('tp1', $tx1, $tx1a, $tx1c);
+$pat2 = makeTexturePattern('tp2', $tx2, $tx2a, $tx2c);
+$patParts = array_filter([$pat1, $pat2], fn($p) => $p !== '');
+$defs = !empty($patParts)
+    ? "<defs>\n" . implode("\n", $patParts) . "\n</defs>"
+    : '';
+
+// Build square fill lines.
+// When a texture is active wrap both rects in a <g id="e/f"> so the <use>
+// elements clone the whole group (colour + texture).
+$sq1Fill = $pat1 !== ''
+    ? "        <g id=\"e\">\n          <rect width=\"1\" height=\"1\" fill=\"{$sq1rgba}\"/>\n          <rect width=\"1\" height=\"1\" fill=\"url(#tp1)\"/>\n        </g>"
+    : "        <rect width=\"1\" height=\"1\" id=\"e\" fill=\"{$sq1rgba}\"/>";
+$sq2Fill = $pat2 !== ''
+    ? "        <g id=\"f\">\n          <rect y=\"1\" width=\"1\" height=\"1\" fill=\"{$sq2rgba}\"/>\n          <rect y=\"1\" width=\"1\" height=\"1\" fill=\"url(#tp2)\"/>\n        </g>"
+    : "        <rect y=\"1\" width=\"1\" height=\"1\" id=\"f\" fill=\"{$sq2rgba}\"/>";
+
 // Build 8×8 checkerboard SVG board pattern
-$svg = implode("\n", [
+$svgParts = [
     '<?xml version="1.0" encoding="UTF-8" standalone="no"?>',
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:x="http://www.w3.org/1999/xlink"',
     '     viewBox="0 0 8 8" shape-rendering="crispEdges">',
+];
+if ($defs !== '') $svgParts[] = $defs;
+$svgParts = array_merge($svgParts, [
     '<g id="a">',
     '  <g id="b">',
     '    <g id="c">',
     '      <g id="d">',
-    "        <rect width=\"1\" height=\"1\" id=\"e\" fill=\"{$sq1rgba}\"/>",
+    $sq1Fill,
     '        <use x="1" y="1" href="#e" x:href="#e"/>',
-    "        <rect y=\"1\" width=\"1\" height=\"1\" id=\"f\" fill=\"{$sq2rgba}\"/>",
+    $sq2Fill,
     '        <use x="1" y="-1" href="#f" x:href="#f"/>',
     '      </g>',
     '      <use x="2" href="#d" x:href="#d"/>',
@@ -78,6 +159,7 @@ $svg = implode("\n", [
     '</svg>',
 ]);
 
+$svg = implode("\n", $svgParts);
 $b64 = base64_encode($svg);
 
 // Move destination style
