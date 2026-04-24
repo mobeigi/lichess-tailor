@@ -56,22 +56,45 @@ const TEXTURE_PATHS = [
         '</g></svg>',
 ];
 
-function makeTexturePattern(string $patId, string $txId, int $alphaPercent, string $colour): string
+function makeTexturePattern(string $patId, string $txId, int $alphaPercent, string $colour, string $customSvg = ''): string
 {
-    if ($txId === 'none' || !isset(TEXTURE_PATHS[$txId])) return '';
+    // Resolve SVG source: named registry or custom upload
+    if ($txId === 'custom') {
+        if ($customSvg === '' || stripos($customSvg, '<svg') === false) return '';
+        $svgSrc = $customSvg;
+    } elseif (isset(TEXTURE_PATHS[$txId])) {
+        $svgSrc = TEXTURE_PATHS[$txId];
+    } else {
+        return '';
+    }
+
     $opacity = number_format($alphaPercent / 100, 2, '.', '');
-    $scale   = '0.015625'; // 1/64 — scale from 64×64 viewBox to 1 SVG unit
-    // Strip the outer <svg> wrapper then replace all black colour references
-    // (#000000, #000, or the keyword "black" as an attribute value) with the
-    // user-chosen colour. This makes the registry work for any well-formed SVG.
-    $raw   = preg_replace('/<svg[^>]*>/', '', TEXTURE_PATHS[$txId]);
+
+    // Determine viewBox width for scaling (fallback to 64 if not found).
+    // viewBox="minX minY width height" — width is the 3rd token (index 2).
+    $viewBoxSize = 64;
+    if (preg_match('/viewBox=["\']([^"\']*)["\']/', $svgSrc, $vb)) {
+        $parts = preg_split('/[\s,]+/', trim($vb[1]));
+        if (count($parts) === 4 && (float)$parts[2] > 0) {
+            $viewBoxSize = (float)$parts[2];
+        }
+    }
+    $scale = number_format(1 / $viewBoxSize, 10, '.', '');
+
+    // Strip the outer <svg> wrapper, then remove all inline fill/stroke colour
+    // attributes from child elements (preserving fill="none" which is structural).
+    // The wrapper <g> sets fill and stroke to the chosen colour so every element
+    // inherits it, making the colour picker work for any SVG.
+    $raw   = preg_replace('/<svg[^>]*>/', '', $svgSrc);
     $raw   = preg_replace('/<\/svg>\s*$/', '', $raw);
-    $raw   = str_replace('#000000', "#{$colour}", $raw);
-    $raw   = preg_replace('/#000(?![0-9a-fA-F])/', "#{$colour}", $raw);
-    $inner = preg_replace('/(["\'])black\1/', "$1#{$colour}$1", $raw);
+    $raw   = preg_replace('/\s+fill="(?!none")[^"]*"/', '', $raw);
+    $raw   = preg_replace("/\\s+fill='(?!none')[^']*'/", '', $raw);
+    $raw   = preg_replace('/\s+stroke="(?!none")[^"]*"/', '', $raw);
+    $inner = preg_replace("/\\s+stroke='(?!none')[^']*'/", '', $raw);
+
     return implode("\n", [
         "<pattern id=\"{$patId}\" x=\"0\" y=\"0\" width=\"1\" height=\"1\" patternUnits=\"userSpaceOnUse\">",
-        "  <g opacity=\"{$opacity}\" transform=\"scale({$scale})\">",
+        "  <g fill=\"#{$colour}\" stroke=\"#{$colour}\" opacity=\"{$opacity}\" transform=\"scale({$scale})\">",
         "    {$inner}",
         "  </g>",
         "</pattern>",
@@ -97,13 +120,25 @@ $oca    = validateAlpha($_GET['oca']    ?? 60,        60);
 $pm     = validateHex  ($_GET['pm']     ?? 'bb37bc', 'bb37bc');
 $pma    = validateAlpha($_GET['pma']    ?? 60,        60);
 
-$validTextures = array_merge(['none'], array_keys(TEXTURE_PATHS));
+$validTextures = array_merge(['none', 'custom'], array_keys(TEXTURE_PATHS));
 $tx1    = in_array($_GET['tx1'] ?? '', $validTextures, true) ? $_GET['tx1'] : 'none';
 $tx1a   = validateAlpha($_GET['tx1a']   ?? 10,         10);
 $tx1c   = validateHex  ($_GET['tx1c']   ?? '000000', '000000');
 $tx2    = in_array($_GET['tx2'] ?? '', $validTextures, true) ? $_GET['tx2'] : 'none';
 $tx2a   = validateAlpha($_GET['tx2a']   ?? 10,         10);
 $tx2c   = validateHex  ($_GET['tx2c']   ?? '000000', '000000');
+
+// Decode custom SVG uploads (base64-encoded, UTF-8 content)
+function decodeCustomSvg(mixed $val): string
+{
+    if (!is_string($val) || $val === '') return '';
+    $decoded = base64_decode($val, true);
+    if ($decoded === false) return '';
+    // Basic sanity check — must contain an <svg element
+    return (stripos($decoded, '<svg') !== false) ? $decoded : '';
+}
+$tx1svg = decodeCustomSvg($_GET['tx1svg'] ?? '');
+$tx2svg = decodeCustomSvg($_GET['tx2svg'] ?? '');
 
 // Convert to rgba strings
 $sq1rgba = toRgba($sq1, $sq1a);
@@ -115,8 +150,8 @@ $ocRgba  = toRgba($oc,   $oca);
 $pmRgba  = toRgba($pm,   $pma);
 
 // Build texture patterns
-$pat1 = makeTexturePattern('tp1', $tx1, $tx1a, $tx1c);
-$pat2 = makeTexturePattern('tp2', $tx2, $tx2a, $tx2c);
+$pat1 = makeTexturePattern('tp1', $tx1, $tx1a, $tx1c, $tx1svg);
+$pat2 = makeTexturePattern('tp2', $tx2, $tx2a, $tx2c, $tx2svg);
 $patParts = array_filter([$pat1, $pat2], fn($p) => $p !== '');
 $defs = !empty($patParts)
     ? "<defs>\n" . implode("\n", $patParts) . "\n</defs>"

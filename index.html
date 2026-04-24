@@ -429,6 +429,23 @@
     }
     .ov-mode:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 
+    .tx-upload-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface2);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.28rem 0.45rem;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tx-upload-btn:hover { color: var(--text); border-color: var(--muted); }
+    .tx-upload-btn:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+    .tx-upload-btn.has-custom { color: var(--accent); border-color: var(--accent); }
+
     .ov-alpha-row { display: flex; align-items: center; gap: 8px; margin-top: 2px; }
 
     .alpha-lbl { font-size: 0.78rem; color: var(--muted); width: 1rem; flex-shrink: 0; font-style: italic; }
@@ -817,7 +834,10 @@
                 <option value="vertical">Vertical</option>
                 <option value="diagonal">Diagonal</option>
                 <option value="waves">Waves</option>
+                <option value="custom">Custom…</option>
               </select>
+              <button class="tx-upload-btn" id="tx1-upload" title="Upload SVG" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></button>
+              <input type="file" id="tx1-file" accept=".svg,image/svg+xml" style="display:none">
             </div>
             <div class="color-row">
               <div class="swatch" id="tx1-sw"><input type="color" id="tx1-color" value="#000000"></div>
@@ -840,7 +860,10 @@
                 <option value="vertical">Vertical</option>
                 <option value="diagonal">Diagonal</option>
                 <option value="waves">Waves</option>
+                <option value="custom">Custom…</option>
               </select>
+              <button class="tx-upload-btn" id="tx2-upload" title="Upload SVG" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></button>
+              <input type="file" id="tx2-file" accept=".svg,image/svg+xml" style="display:none">
             </div>
             <div class="color-row">
               <div class="swatch" id="tx2-sw"><input type="color" id="tx2-color" value="#000000"></div>
@@ -885,27 +908,75 @@ const TEXTURES = {
   waves:      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><g fill="none" stroke="#000000" stroke-width="2"><path d="M4 5c1.73 0 2.59 1.06 3.85 2.8s2.64 3.62 5.48 3.62S17.57 9.5 18.8 7.8 20.92 5 22.66 5s2.6 1.06 3.86 2.8 2.63 3.62 5.47 3.62 4.24-1.92 5.48-3.62S39.59 5 41.32 5s2.6 1.06 3.87 2.8 2.63 3.62 5.47 3.62 4.25-1.92 5.48-3.62S58.26 5 60 5"/><path d="M4 17.39c1.73 0 2.59 1.07 3.85 2.8s2.64 3.63 5.48 3.63 4.24-1.93 5.47-3.63 2.12-2.8 3.86-2.8 2.6 1.07 3.86 2.8 2.63 3.63 5.47 3.63 4.24-1.93 5.48-3.63 2.12-2.8 3.85-2.8 2.6 1.07 3.87 2.8 2.63 3.63 5.47 3.63 4.25-1.93 5.48-3.63 2.12-2.8 3.86-2.8"/><path d="M4 29.79c1.73 0 2.59 1.06 3.85 2.8s2.64 3.62 5.48 3.62 4.24-1.92 5.47-3.62 2.12-2.8 3.86-2.8 2.6 1.06 3.86 2.8 2.63 3.62 5.47 3.62 4.24-1.92 5.48-3.62 2.12-2.8 3.85-2.8 2.6 1.06 3.87 2.8 2.63 3.62 5.47 3.62 4.25-1.92 5.48-3.62 2.12-2.8 3.86-2.8"/><path d="M4 42.18c1.73 0 2.59 1.07 3.85 2.8s2.64 3.63 5.48 3.63 4.24-1.93 5.47-3.63 2.12-2.8 3.86-2.8 2.6 1.07 3.86 2.8 2.63 3.63 5.47 3.63 4.24-1.93 5.48-3.63 2.12-2.8 3.85-2.8 2.6 1.07 3.87 2.8 2.63 3.63 5.47 3.63 4.25-1.93 5.48-3.63 2.12-2.8 3.86-2.8"/><path d="M4 54.58c1.73 0 2.59 1.06 3.85 2.8s2.64 3.62 5.48 3.62 4.24-1.92 5.47-3.62 2.12-2.8 3.86-2.8 2.6 1.06 3.86 2.8 2.63 3.62 5.47 3.62 4.24-1.92 5.48-3.62 2.12-2.8 3.85-2.8 2.6 1.06 3.87 2.8 2.63 3.62 5.47 3.62 4.25-1.92 5.48-3.62 2.12-2.8 3.86-2.8"/></g></svg>',
 };
 
+// ── Custom SVG store ─────────────────────────────────────────────────────────
+// Holds the raw SVG string for each channel when the user uploads a file.
+// Keyed by prefix ('tx1' or 'tx2'). Null means no custom SVG loaded.
+const customSVG = { tx1: null, tx2: null };
+
+// Strip non-essential attributes from an SVG string to reduce its size before
+// encoding into the URL. Keeps only the structure and path data.
+function sanitiseSVG(raw) {
+  return raw
+    .replace(/\s+version="[^"]*"/g, '')
+    .replace(/\s+xmlns:xlink="[^"]*"/g, '')
+    .replace(/\s+x="0"\s+y="0"/g, '')
+    .replace(/\s+x="0"/g, '')
+    .replace(/\s+y="0"/g, '')
+    .replace(/\s+width="[^"]*"/g, '')
+    .replace(/\s+height="[^"]*"/g, '')
+    .replace(/\s+style="[^"]*"/g, '')
+    .replace(/\s+xml:space="[^"]*"/g, '')
+    .replace(/\s+enable-background="[^"]*"/g, '')
+    .replace(/\s+data-name="[^"]*"/g, '')
+    .replace(/\s+data-original="[^"]*"/g, '')
+    .replace(/\s+opacity="1"/g, '')
+    .replace(/\s+class="[^"]*"/g, '')
+    .replace(/>\s+</g, '><')
+    .trim();
+}
+
 // Build the texture <pattern> block for one square type.
 // patId: 'tp1' or 'tp2', sqSize: SVG units per square (1 in our 8×8 viewBox).
 // The texture SVG paths are scaled from 64×64 to sqSize×sqSize via a transform.
 // colour: a CSS hex colour string (e.g. '#000000') applied to stroke and fill.
-function makeTexturePattern(patId, txId, alphaPercent, sqSize, colour) {
-  if (txId === 'none' || !TEXTURES[txId]) return '';
+function makeTexturePattern(patId, txId, alphaPercent, sqSize, colour, prefix) {
+  // Resolve the SVG source: named registry or custom upload
+  let svgSrc = null;
+  if (txId === 'custom') {
+    svgSrc = customSVG[prefix] ?? null;
+  } else {
+    svgSrc = TEXTURES[txId] ?? null;
+  }
+  if (!svgSrc) return '';
+
   const opacity = parseFloat((alphaPercent / 100).toFixed(2));
-  const scale   = sqSize / 64;   // scale factor from the 64×64 texture viewBox to 1 SVG unit
-  // Strip the outer <svg> wrapper, then replace all black colour references
-  // (#000000, #000, or the keyword "black" as an attribute value) with the
-  // user-chosen colour. This makes the registry work for any well-formed SVG.
-  const inner = TEXTURES[txId]
+  // Determine viewBox width for scaling (fallback to 64 if not found).
+  // viewBox="minX minY width height" — width is the 3rd token (index 2).
+  let viewBoxSize = 64;
+  const vbMatch = svgSrc.match(/viewBox=["']([^"']*)["']/);
+  if (vbMatch) {
+    const parts = vbMatch[1].trim().split(/[\s,]+/);
+    if (parts.length === 4 && parseFloat(parts[2]) > 0) {
+      viewBoxSize = parseFloat(parts[2]);
+    }
+  }
+  const scale = sqSize / viewBoxSize;
+
+  // Strip the outer <svg> wrapper, then remove all inline fill/stroke colour
+  // attributes from child elements (preserving fill="none" which is structural).
+  // The wrapper <g> then sets fill and stroke to the chosen colour so every
+  // element inherits it, making the colour picker work for any SVG.
+  const inner = svgSrc
     .replace(/^<svg[^>]*>/, '')
     .replace(/<\/svg>\s*$/, '')
-    .replace(/#000000/g, colour)
-    .replace(/#000(?![0-9a-fA-F])/g, colour)
-    .replace(/(["'])black\1/g, `$1${colour}$1`);
+    .replace(/\s+fill="(?!none")[^"]*"/g, '')
+    .replace(/\s+stroke="(?!none")[^"]*"/g, '')
+    .replace(/\s+fill='(?!none')[^']*'/g, '')
+    .replace(/\s+stroke='(?!none')[^']*'/g, '');
   return [
     `<pattern id="${patId}" x="0" y="0" width="${sqSize}" height="${sqSize}"`,
     `         patternUnits="userSpaceOnUse">`,
-    `  <g opacity="${opacity}" transform="scale(${scale})">`,
+    `  <g fill="${colour}" stroke="${colour}" opacity="${opacity}" transform="scale(${scale})">`,
     inner,
     `  </g>`,
     `</pattern>`,
@@ -914,8 +985,8 @@ function makeTexturePattern(patId, txId, alphaPercent, sqSize, colour) {
 
 function makeSVG(c1, c2, tx1Id = 'none', tx1Alpha = 10, tx1Colour = '#000000', tx2Id = 'none', tx2Alpha = 10, tx2Colour = '#000000') {
   const sqSize = 1; // each square is 1 unit in the 8×8 viewBox
-  const pat1 = makeTexturePattern('tp1', tx1Id, tx1Alpha, sqSize, tx1Colour);
-  const pat2 = makeTexturePattern('tp2', tx2Id, tx2Alpha, sqSize, tx2Colour);
+  const pat1 = makeTexturePattern('tp1', tx1Id, tx1Alpha, sqSize, tx1Colour, 'tx1');
+  const pat2 = makeTexturePattern('tp2', tx2Id, tx2Alpha, sqSize, tx2Colour, 'tx2');
   const hasTex1 = pat1 !== '';
   const hasTex2 = pat2 !== '';
 
@@ -1199,9 +1270,14 @@ function applyPreset(p) {
   if (p.mdMode) document.getElementById('md-mode').value = p.mdMode;
   // Textures — only apply if present in the preset object
   ['tx1', 'tx2'].forEach(prefix => {
-    const typeKey  = prefix;         // e.g. 'tx1'
-    const alphaKey = prefix + 'A';   // e.g. 'tx1A'
-    const colKey   = prefix + 'C';   // e.g. 'tx1C'
+    const typeKey  = prefix;          // e.g. 'tx1'
+    const alphaKey = prefix + 'A';    // e.g. 'tx1A'
+    const colKey   = prefix + 'C';    // e.g. 'tx1C'
+    const svgKey   = prefix + 'SVG';  // e.g. 'tx1SVG' — custom SVG content
+    // Restore custom SVG into the store before setting the select value
+    if (p[svgKey] !== undefined) {
+      customSVG[prefix] = p[svgKey];
+    }
     if (p[typeKey] !== undefined) {
       document.getElementById(`${prefix}-type`).value = p[typeKey];
     }
@@ -1304,21 +1380,78 @@ wireOverlay('pm');
 
 document.getElementById('md-mode').addEventListener('change', () => { update(); syncPresetHighlight(); });
 
-// Wire texture controls (type select + colour picker + hex input + alpha slider)
+// Wire texture controls (type select + upload button + colour picker + hex input + alpha slider)
 (function wireTextures() {
   ['tx1', 'tx2'].forEach(prefix => {
-    const sel    = document.getElementById(`${prefix}-type`);
-    const picker = document.getElementById(`${prefix}-color`);
-    const hexIn  = document.getElementById(`${prefix}-hex`);
-    const swatch = document.getElementById(`${prefix}-sw`);
-    const slider = document.getElementById(`${prefix}-alpha`);
-    const valEl  = document.getElementById(`${prefix}-alpha-val`);
+    const sel       = document.getElementById(`${prefix}-type`);
+    const uploadBtn = document.getElementById(`${prefix}-upload`);
+    const fileInput = document.getElementById(`${prefix}-file`);
+    const picker    = document.getElementById(`${prefix}-color`);
+    const hexIn     = document.getElementById(`${prefix}-hex`);
+    const swatch    = document.getElementById(`${prefix}-sw`);
+    const slider    = document.getElementById(`${prefix}-alpha`);
+    const valEl     = document.getElementById(`${prefix}-alpha-val`);
 
     // Initialise swatch and slider gradient from the default colour
     swatch.style.background = picker.value;
     setSliderGradient(slider, picker.value);
 
-    sel.addEventListener('change', () => { update(); });
+    // Helper: reflect whether a custom SVG is loaded onto the upload button
+    function syncUploadBtn() {
+      uploadBtn.classList.toggle('has-custom', !!customSVG[prefix]);
+    }
+    syncUploadBtn();
+
+    // Select change — selecting 'custom' from the dropdown triggers an upload.
+    // All other values just call update() normally.
+    sel.addEventListener('change', () => {
+      if (sel.value === 'custom') {
+        triggerUpload();
+        return;
+      }
+      update();
+    });
+
+    // Upload button — always triggers a new file pick regardless of current state
+    uploadBtn.addEventListener('click', () => {
+      triggerUpload();
+    });
+
+    function triggerUpload() {
+      fileInput.value = ''; // reset so the same file can be re-selected
+      fileInput.click();
+    }
+
+    // Handle file selection result
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = e => {
+        const raw = e.target.result;
+        if (!raw || !/<svg[\s>]/i.test(raw)) {
+          // Invalid file — revert to none
+          customSVG[prefix] = null;
+          sel.value = 'none';
+          syncUploadBtn();
+          update();
+          return;
+        }
+        customSVG[prefix] = sanitiseSVG(raw);
+        sel.value = 'custom';
+        syncUploadBtn();
+        update();
+      };
+      reader.onerror = () => {
+        // Read error — revert to none
+        customSVG[prefix] = null;
+        sel.value = 'none';
+        syncUploadBtn();
+        update();
+      };
+      reader.readAsText(file);
+    });
 
     picker.addEventListener('input', () => {
       hexIn.value = picker.value;
@@ -1346,17 +1479,26 @@ document.getElementById('md-mode').addEventListener('change', () => { update(); 
       update();
     });
   });
+
+  // Exposed so loadFromParams can sync button states after restoring custom SVGs
+  window._syncUploadBtns = () => {
+    ['tx1', 'tx2'].forEach(prefix => {
+      const btn = document.getElementById(`${prefix}-upload`);
+      if (btn) btn.classList.toggle('has-custom', !!customSVG[prefix]);
+    });
+  };
 })();
 
 renderPresets('duo');
 loadFromParams();
+window._syncUploadBtns();
 
 document.getElementById('install-btn').addEventListener('click', () => {
   window.open(`/style.user.css?${buildStyleParams()}`, '_blank');
 });
 
 function buildStyleParams() {
-  return new URLSearchParams({
+  const params = {
     sq1:    document.getElementById('sq1-color').value.slice(1),
     sq1a:   document.getElementById('sq1-alpha').value,
     sq2:    document.getElementById('sq2-color').value.slice(1),
@@ -1378,7 +1520,18 @@ function buildStyleParams() {
     tx2:    document.getElementById('tx2-type').value,
     tx2a:   document.getElementById('tx2-alpha').value,
     tx2c:   document.getElementById('tx2-color').value.slice(1),
-  });
+  };
+  // If custom is selected but no SVG was uploaded, treat it as none
+  if (params.tx1 === 'custom' && !customSVG.tx1) params.tx1 = 'none';
+  if (params.tx2 === 'custom' && !customSVG.tx2) params.tx2 = 'none';
+  // Embed custom SVG as base64 when active so Install and Share are self-contained
+  if (params.tx1 === 'custom') {
+    params.tx1svg = btoa(unescape(encodeURIComponent(customSVG.tx1)));
+  }
+  if (params.tx2 === 'custom') {
+    params.tx2svg = btoa(unescape(encodeURIComponent(customSVG.tx2)));
+  }
+  return new URLSearchParams(params);
 }
 
 function loadFromParams() {
@@ -1392,11 +1545,23 @@ function loadFromParams() {
     const v = parseInt(p.get(key));
     return isNaN(v) ? def : Math.max(0, Math.min(100, v));
   };
-  const VALID_TEXTURES = ['none', ...Object.keys(TEXTURES)];
+  const VALID_TEXTURES = ['none', 'custom', ...Object.keys(TEXTURES)];
   const texture = (key, def) => {
     const v = p.get(key) || '';
     return VALID_TEXTURES.includes(v) ? v : def;
   };
+  // Restore custom SVGs from base64 params before applyPreset runs
+  ['tx1', 'tx2'].forEach(prefix => {
+    const b64 = p.get(`${prefix}svg`);
+    if (b64) {
+      try {
+        const decoded = decodeURIComponent(escape(atob(b64)));
+        if (/<svg[\s>]/i.test(decoded)) {
+          customSVG[prefix] = decoded;
+        }
+      } catch (e) { /* malformed base64 — ignore */ }
+    }
+  });
   applyPreset({
     sq1: hex('sq1', 'edd6b0'), sq1A: alpha('sq1a', 100),
     sq2: hex('sq2', 'b88762'), sq2A: alpha('sq2a', 100),
