@@ -834,6 +834,8 @@
                 <option value="vertical">Vertical</option>
                 <option value="diagonal">Diagonal</option>
                 <option value="waves">Waves</option>
+                <option value="chess">Chess</option>
+                <option value="loading">Loading</option>
                 <option value="custom">Custom…</option>
               </select>
               <button class="tx-upload-btn" id="tx1-upload" title="Upload SVG" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></button>
@@ -860,6 +862,8 @@
                 <option value="vertical">Vertical</option>
                 <option value="diagonal">Diagonal</option>
                 <option value="waves">Waves</option>
+                <option value="chess">Chess</option>
+                <option value="loading">Loading</option>
                 <option value="custom">Custom…</option>
               </select>
               <button class="tx-upload-btn" id="tx2-upload" title="Upload SVG" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></button>
@@ -897,16 +901,20 @@
 <script>
 
 // ── Texture registry ────────────────────────────────────────────────────────
-// Each entry is a complete SVG string (viewBox="0 0 64 64") using #000000 for
-// all stroke/fill colours. The <svg> wrapper is stripped at render time and
-// the colour replaced with the user's chosen colour.
-// To add a new texture: paste its SVG here as a string — no other changes needed.
-const TEXTURES = {
-  horizontal: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><g transform="rotate(90 32 32) translate(0 0)"><path d="M4 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM12 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM20 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM28 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM36 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM44 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM52 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM60 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1z" fill="#000000"/></g></svg>',
-  vertical:   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><g><path d="M4 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM12 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM20 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM28 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM36 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM44 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM52 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1zM60 3a1 1 0 0 0-1 1v56a1 1 0 0 0 2 0V4a1 1 0 0 0-1-1z" fill="#000000"/></g></svg>',
-  diagonal:   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><g><path d="M4 15.51a1 1 0 0 0 .71-.29L15.22 4.71a1 1 0 1 0-1.42-1.42L3.29 13.8a1 1 0 0 0 0 1.42 1 1 0 0 0 .71.29zM4 26.89a1 1 0 0 0 .71-.29L26.6 4.71a1 1 0 1 0-1.42-1.42L3.29 25.18a1 1 0 0 0 0 1.42 1 1 0 0 0 .71.29zM4 38.25a1 1 0 0 0 .71-.25L38 4.71a1 1 0 1 0-1.42-1.42L3.29 36.54a1 1 0 0 0 0 1.42 1 1 0 0 0 .71.29zM4 49.63a1 1 0 0 0 .71-.29L49.34 4.71a1 1 0 1 0-1.42-1.42L3.29 47.92a1 1 0 0 0 0 1.42 1 1 0 0 0 .71.29zM60.71 3.29a1 1 0 0 0-1.42 0l-56 56a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l56-56a1 1 0 0 0 0-1.42zM59.29 14.66 14.66 59.29a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l44.63-44.63a1 1 0 0 0-1.42-1.42zM59.29 26 26 59.29a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l33.29-33.25A1 1 0 0 0 59.29 26zM59.29 37.4 37.4 59.29a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l21.89-21.89a1 1 0 0 0-1.42-1.42zM59.29 48.78 48.78 59.29a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0L60.71 50.2a1 1 0 0 0-1.42-1.42z" fill="#000000"/></g></svg>',
-  waves:      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><g fill="none" stroke="#000000" stroke-width="2"><path d="M4 5c1.73 0 2.59 1.06 3.85 2.8s2.64 3.62 5.48 3.62S17.57 9.5 18.8 7.8 20.92 5 22.66 5s2.6 1.06 3.86 2.8 2.63 3.62 5.47 3.62 4.24-1.92 5.48-3.62S39.59 5 41.32 5s2.6 1.06 3.87 2.8 2.63 3.62 5.47 3.62 4.25-1.92 5.48-3.62S58.26 5 60 5"/><path d="M4 17.39c1.73 0 2.59 1.07 3.85 2.8s2.64 3.63 5.48 3.63 4.24-1.93 5.47-3.63 2.12-2.8 3.86-2.8 2.6 1.07 3.86 2.8 2.63 3.63 5.47 3.63 4.24-1.93 5.48-3.63 2.12-2.8 3.85-2.8 2.6 1.07 3.87 2.8 2.63 3.63 5.47 3.63 4.25-1.93 5.48-3.63 2.12-2.8 3.86-2.8"/><path d="M4 29.79c1.73 0 2.59 1.06 3.85 2.8s2.64 3.62 5.48 3.62 4.24-1.92 5.47-3.62 2.12-2.8 3.86-2.8 2.6 1.06 3.86 2.8 2.63 3.62 5.47 3.62 4.24-1.92 5.48-3.62 2.12-2.8 3.85-2.8 2.6 1.06 3.87 2.8 2.63 3.62 5.47 3.62 4.25-1.92 5.48-3.62 2.12-2.8 3.86-2.8"/><path d="M4 42.18c1.73 0 2.59 1.07 3.85 2.8s2.64 3.63 5.48 3.63 4.24-1.93 5.47-3.63 2.12-2.8 3.86-2.8 2.6 1.07 3.86 2.8 2.63 3.63 5.47 3.63 4.24-1.93 5.48-3.63 2.12-2.8 3.85-2.8 2.6 1.07 3.87 2.8 2.63 3.63 5.47 3.63 4.25-1.93 5.48-3.63 2.12-2.8 3.86-2.8"/><path d="M4 54.58c1.73 0 2.59 1.06 3.85 2.8s2.64 3.62 5.48 3.62 4.24-1.92 5.47-3.62 2.12-2.8 3.86-2.8 2.6 1.06 3.86 2.8 2.63 3.62 5.47 3.62 4.24-1.92 5.48-3.62 2.12-2.8 3.85-2.8 2.6 1.06 3.87 2.8 2.63 3.62 5.47 3.62 4.25-1.92 5.48-3.62 2.12-2.8 3.86-2.8"/></g></svg>',
-};
+// Loaded server-side from /images/textures/ — no inline SVG strings needed.
+// To add a new texture: drop the .svg file in that folder, add an <option>, done.
+const TEXTURES = <?php
+$txDir   = __DIR__ . '/images/textures/';
+$txOrder = ['horizontal', 'vertical', 'diagonal', 'waves', 'chess', 'loading'];
+$txMap   = [];
+foreach ($txOrder as $name) {
+    $file = $txDir . $name . '.svg';
+    if (is_readable($file)) {
+        $txMap[$name] = file_get_contents($file);
+    }
+}
+echo json_encode($txMap, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+?>;
 
 // ── Custom SVG store ─────────────────────────────────────────────────────────
 // Holds the raw SVG string for each channel when the user uploads a file.
@@ -1011,7 +1019,6 @@ function makeSVG(c1, c2, tx1Id = 'none', tx1Alpha = 10, tx1Colour = '#000000', t
     : '';
 
   return [
-    '<?xml version="1.0" encoding="UTF-8" standalone="no"?>',
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:x="http://www.w3.org/1999/xlink"',
     '     viewBox="0 0 8 8" shape-rendering="crispEdges">',
     defs,
