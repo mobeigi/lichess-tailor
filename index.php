@@ -960,17 +960,18 @@ function makeTexturePattern(patId, txId, alphaPercent, sqSize, colour, prefix) {
   if (!svgSrc) return '';
 
   const opacity = parseFloat((alphaPercent / 100).toFixed(2));
-  // Determine viewBox width for scaling (fallback to 64 if not found).
-  // viewBox="minX minY width height" — width is the 3rd token (index 2).
-  let viewBoxSize = 64;
+  // Determine full viewBox for scaling/positioning (fallback to 0 0 64 64 if not found).
+  // viewBox="minX minY width height"
+  let minX = 0, minY = 0, viewBoxWidth = 64, viewBoxHeight = 64;
   const vbMatch = svgSrc.match(/viewBox=["']([^"']*)["']/);
   if (vbMatch) {
-    const parts = vbMatch[1].trim().split(/[\s,]+/);
-    if (parts.length === 4 && parseFloat(parts[2]) > 0) {
-      viewBoxSize = parseFloat(parts[2]);
+    const parts = vbMatch[1].trim().split(/[\s,]+/).map(parseFloat);
+    if (parts.length === 4 && parts[2] > 0 && parts[3] > 0) {
+      [minX, minY, viewBoxWidth, viewBoxHeight] = parts;
     }
   }
-  const scale = sqSize / viewBoxSize;
+  const scaleX = sqSize / viewBoxWidth;
+  const scaleY = sqSize / viewBoxHeight;
 
   // Strip the outer <svg> wrapper, then replace all explicit black colour
   // values (#000000, #000, black) with the chosen colour. The wrapper <g>
@@ -986,7 +987,7 @@ function makeTexturePattern(patId, txId, alphaPercent, sqSize, colour, prefix) {
   return [
     `<pattern id="${patId}" x="0" y="0" width="${sqSize}" height="${sqSize}"`,
     `         patternUnits="userSpaceOnUse">`,
-    `  <g fill="${colour}" stroke="${colour}" opacity="${opacity}" transform="scale(${scale})">`,
+    `  <g fill="${colour}" stroke="${colour}" opacity="${opacity}" transform="translate(${-minX * scaleX}, ${-minY * scaleY}) scale(${scaleX}, ${scaleY})">`,
     inner,
     `  </g>`,
     `</pattern>`,
