@@ -698,6 +698,8 @@
       position: absolute;
       inset: 0;
     }
+    /* Hide rank/file coordinates on the preview board */
+    .cg-wrap coords { display: none !important; }
     /* CBurnett piece images */
     cg-board piece { background-size: 100%; background-repeat: no-repeat; }
     piece.pawn.white   { background-image: url('https://raw.githubusercontent.com/lichess-org/lila/master/public/piece/cburnett/wP.svg'); }
