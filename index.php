@@ -1638,7 +1638,7 @@ function openTexturePicker(prefix) {
   pickerActivePrefix = prefix;
   const picker = document.getElementById('tx-picker');
   const title  = document.getElementById('tx-picker-title');
-  title.textContent = prefix === 'tx1' ? 'Light Squares — Choose Texture' : 'Dark Squares — Choose Texture';
+  title.textContent = prefix === 'tx1' ? 'Choose Texture for Light Squares' : 'Choose Texture for Dark Squares';
   renderLibraryPicker(prefix);
   picker.style.display = 'flex';
 }
