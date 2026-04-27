@@ -298,6 +298,7 @@
       flex-direction: column;
       gap: 0.5rem;
       height: 100%;
+      position: relative;
     }
 
     /* ── Created-by card ── */
@@ -431,22 +432,142 @@
     }
     .ov-mode:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 
-    .tx-upload-btn {
-      display: inline-flex;
+    /* ── Texture icon box (in sidebar) ── */
+    .tx-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+    .tx-icon-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      flex-shrink: 0;
+    }
+    .tx-icon {
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      background: #f5f5f5;
+      position: relative;
+      overflow: hidden;
+    }
+    .tx-icon:hover { border-color: var(--muted); }
+    .tx-icon.active { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(124,58,237,0.3); }
+    .tx-icon-inner {
+      width: 100%;
+      height: 100%;
+      display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--surface2);
-      color: var(--muted);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 0.28rem 0.45rem;
-      cursor: pointer;
-      flex-shrink: 0;
-      transition: color 0.15s, border-color 0.15s;
     }
-    .tx-upload-btn:hover { color: var(--text); border-color: var(--muted); }
-    .tx-upload-btn:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-    .tx-upload-btn.has-custom { color: var(--accent); border-color: var(--accent); }
+    .tx-icon-inner svg { width: 100%; height: 100%; }
+    .tx-icon-label {
+      font-size: 0.65rem;
+      color: var(--muted);
+      text-align: center;
+      max-width: 56px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .tx-icon.active + .tx-icon-label { color: var(--text); }
+    .tx-controls { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.45rem; }
+
+    /* ── Texture library picker (full sidebar overlay) ── */
+    .tx-picker {
+      position: absolute;
+      inset: 0;
+      background: var(--bg);
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      border-radius: inherit;
+    }
+    .tx-picker-header {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.75rem 1rem 0.6rem;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .tx-picker-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: none;
+      border: none;
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 0.2rem 0.4rem;
+      border-radius: 6px;
+      transition: background 0.12s;
+    }
+    .tx-picker-back:hover { background: var(--surface2); }
+    .tx-picker-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .tx-picker-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.75rem 1rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .tx-picker-body::-webkit-scrollbar { width: 5px; }
+    .tx-picker-body::-webkit-scrollbar-track { background: transparent; }
+    .tx-picker-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    .tx-lib-group {}
+    .tx-lib-group-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+    .tx-lib-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .tx-lib-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      cursor: pointer;
+    }
+    .tx-lib-thumb {
+      width: 40px;
+      height: 40px;
+      border-radius: 7px;
+      border: 2px solid var(--border);
+      overflow: hidden;
+      background: #f5f5f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      flex-shrink: 0;
+    }
+    .tx-lib-thumb svg { width: 100%; height: 100%; }
+    .tx-lib-item:hover .tx-lib-thumb { border-color: var(--muted); }
+    .tx-lib-item.active .tx-lib-thumb { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(124,58,237,0.3); }
+    .tx-lib-name { font-size: 0.65rem; color: var(--muted); text-align: center; max-width: 56px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tx-lib-item.active .tx-lib-name { color: var(--text); }
+    /* Upload card in library */
+    .tx-lib-upload .tx-lib-thumb {
+      border-style: dashed;
+      color: var(--muted);
+    }
+    .tx-lib-upload:hover .tx-lib-thumb { border-color: var(--accent); color: var(--accent); }
 
     .ov-alpha-row { display: flex; align-items: center; gap: 8px; margin-top: 2px; }
 
@@ -828,60 +949,68 @@
 
           <!-- Light Square Texture -->
           <div class="ov-item">
-            <div class="ov-head">
-              <span class="ov-name">Light Squares</span>
-              <select class="ov-mode" id="tx1-type">
-                <option value="none">None</option>
-                <option value="horizontal">Horizontal</option>
-                <option value="vertical">Vertical</option>
-                <option value="diagonal">Diagonal</option>
-                <option value="waves">Waves</option>
-                <option value="chess">Chess</option>
-                <option value="loading">Loading</option>
-                <option value="custom">Custom…</option>
-              </select>
-              <button class="tx-upload-btn" id="tx1-upload" title="Upload SVG" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></button>
-              <input type="file" id="tx1-file" accept=".svg,image/svg+xml" style="display:none">
+            <div class="ov-head"><span class="ov-name">Light Squares</span></div>
+            <div class="tx-row">
+              <div class="tx-icon-wrap">
+                <div class="tx-icon preset-thumb" id="tx1-icon" title="Choose texture">
+                  <div class="tx-icon-inner" id="tx1-icon-inner"></div>
+                </div>
+                <div class="tx-icon-label" id="tx1-icon-label">None</div>
+              </div>
+              <div class="tx-controls">
+                <div class="color-row">
+                  <div class="swatch" id="tx1-sw"><input type="color" id="tx1-color" value="#000000"></div>
+                  <input type="text" class="hex-in" id="tx1-hex" value="#000000" maxlength="7" spellcheck="false">
+                </div>
+                <div class="ov-alpha-row">
+                  <span class="alpha-lbl">α</span>
+                  <input type="range" class="alpha-slider" id="tx1-alpha" min="0" max="100" value="10">
+                  <span class="alpha-val" id="tx1-alpha-val">10%</span>
+                </div>
+              </div>
             </div>
-            <div class="color-row">
-              <div class="swatch" id="tx1-sw"><input type="color" id="tx1-color" value="#000000"></div>
-              <input type="text" class="hex-in" id="tx1-hex" value="#000000" maxlength="7" spellcheck="false">
-            </div>
-            <div class="ov-alpha-row">
-              <span class="alpha-lbl">α</span>
-              <input type="range" class="alpha-slider" id="tx1-alpha" min="0" max="100" value="10">
-              <span class="alpha-val" id="tx1-alpha-val">10%</span>
-            </div>
+            <input type="file" id="tx1-file" accept=".svg,image/svg+xml" style="display:none">
           </div>
 
           <!-- Dark Square Texture -->
           <div class="ov-item">
-            <div class="ov-head">
-              <span class="ov-name">Dark Squares</span>
-              <select class="ov-mode" id="tx2-type">
-                <option value="none">None</option>
-                <option value="horizontal">Horizontal</option>
-                <option value="vertical">Vertical</option>
-                <option value="diagonal">Diagonal</option>
-                <option value="waves">Waves</option>
-                <option value="chess">Chess</option>
-                <option value="loading">Loading</option>
-                <option value="custom">Custom…</option>
-              </select>
-              <button class="tx-upload-btn" id="tx2-upload" title="Upload SVG" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></button>
-              <input type="file" id="tx2-file" accept=".svg,image/svg+xml" style="display:none">
+            <div class="ov-head"><span class="ov-name">Dark Squares</span></div>
+            <div class="tx-row">
+              <div class="tx-icon-wrap">
+                <div class="tx-icon preset-thumb" id="tx2-icon" title="Choose texture">
+                  <div class="tx-icon-inner" id="tx2-icon-inner"></div>
+                </div>
+                <div class="tx-icon-label" id="tx2-icon-label">None</div>
+              </div>
+              <div class="tx-controls">
+                <div class="color-row">
+                  <div class="swatch" id="tx2-sw"><input type="color" id="tx2-color" value="#000000"></div>
+                  <input type="text" class="hex-in" id="tx2-hex" value="#000000" maxlength="7" spellcheck="false">
+                </div>
+                <div class="ov-alpha-row">
+                  <span class="alpha-lbl">α</span>
+                  <input type="range" class="alpha-slider" id="tx2-alpha" min="0" max="100" value="10">
+                  <span class="alpha-val" id="tx2-alpha-val">10%</span>
+                </div>
+              </div>
             </div>
-            <div class="color-row">
-              <div class="swatch" id="tx2-sw"><input type="color" id="tx2-color" value="#000000"></div>
-              <input type="text" class="hex-in" id="tx2-hex" value="#000000" maxlength="7" spellcheck="false">
-            </div>
-            <div class="ov-alpha-row">
-              <span class="alpha-lbl">α</span>
-              <input type="range" class="alpha-slider" id="tx2-alpha" min="0" max="100" value="10">
-              <span class="alpha-val" id="tx2-alpha-val">10%</span>
-            </div>
+            <input type="file" id="tx2-file" accept=".svg,image/svg+xml" style="display:none">
           </div>
 
+        </div>
+      </div>
+
+      <!-- Texture library picker (overlays full sidebar when open) -->
+      <div class="tx-picker" id="tx-picker" style="display:none">
+        <div class="tx-picker-header">
+          <button class="tx-picker-back" id="tx-picker-back" type="button">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Back
+          </button>
+          <span class="tx-picker-title" id="tx-picker-title">Choose Texture</span>
+        </div>
+        <div class="tx-picker-body" id="tx-picker-body">
+          <!-- Populated by JS -->
         </div>
       </div>
 
@@ -902,21 +1031,48 @@
 
 <script>
 
-// ── Texture registry ────────────────────────────────────────────────────────
-// Loaded server-side from /images/textures/ — no inline SVG strings needed.
-// To add a new texture: drop the .svg file in that folder, add an <option>, done.
-const TEXTURES = <?php
-$txDir   = __DIR__ . '/images/textures/';
-$txOrder = ['horizontal', 'vertical', 'diagonal', 'waves', 'chess', 'loading'];
-$txMap   = [];
-foreach ($txOrder as $name) {
-    $file = $txDir . $name . '.svg';
-    if (is_readable($file)) {
-        $txMap[$name] = file_get_contents($file);
+// ── Texture library ──────────────────────────────────────────────────────────
+// Loaded server-side from /images/textures/library/<group>/<name>.svg
+// Structure: { groupKey: { label: string, textures: { name: svgString } } }
+// To add a texture: drop the SVG in the right subfolder — no code changes needed.
+const TEXTURE_LIBRARY = <?php
+$libDir = __DIR__ . '/images/textures/library/';
+// Group display order and labels
+$groupMeta = [
+    'basic-patterns'   => 'Basic Patterns',
+    'complex-patterns' => 'Complex Patterns',
+    'players'          => 'Players',
+];
+$library = [];
+foreach ($groupMeta as $groupKey => $groupLabel) {
+    $groupDir = $libDir . $groupKey . '/';
+    if (!is_dir($groupDir)) continue;
+    $textures = [];
+    $files = glob($groupDir . '*.svg');
+    if ($files) {
+        sort($files);
+        foreach ($files as $file) {
+            $name = basename($file, '.svg');
+            $textures[$name] = file_get_contents($file);
+        }
+    }
+    if (!empty($textures)) {
+        $library[$groupKey] = ['label' => $groupLabel, 'textures' => $textures];
     }
 }
-echo json_encode($txMap, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+echo json_encode($library, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 ?>;
+
+// Flat lookup: textureName -> svgString (for makeTexturePattern)
+const TEXTURES = (() => {
+  const flat = {};
+  for (const group of Object.values(TEXTURE_LIBRARY)) {
+    for (const [name, svg] of Object.entries(group.textures)) {
+      flat[name] = svg;
+    }
+  }
+  return flat;
+})();
 
 // ── Custom SVG store ─────────────────────────────────────────────────────────
 // Holds the raw SVG string for each channel when the user uploads a file.
@@ -1061,10 +1217,10 @@ function ovRgba(prefix) {
 }
 
 function generateCSS(c1rgba, c2rgba) {
-  const tx1Type   = document.getElementById('tx1-type').value;
+  const tx1Type   = txState.tx1;
   const tx1Alpha  = parseInt(document.getElementById('tx1-alpha').value);
   const tx1Colour = document.getElementById('tx1-color').value;
-  const tx2Type   = document.getElementById('tx2-type').value;
+  const tx2Type   = txState.tx2;
   const tx2Alpha  = parseInt(document.getElementById('tx2-alpha').value);
   const tx2Colour = document.getElementById('tx2-color').value;
 
@@ -1278,18 +1434,19 @@ function applyPreset(p) {
   setOverlay('oc',  p.oc,  p.ocA);
   setOverlay('pm',  p.pm,  p.pmA);
   if (p.mdMode) document.getElementById('md-mode').value = p.mdMode;
-  // Textures — only apply if present in the preset object
+  // Textures — only apply if present in the preset/params object
   ['tx1', 'tx2'].forEach(prefix => {
     const typeKey  = prefix;          // e.g. 'tx1'
     const alphaKey = prefix + 'A';    // e.g. 'tx1A'
     const colKey   = prefix + 'C';    // e.g. 'tx1C'
     const svgKey   = prefix + 'SVG';  // e.g. 'tx1SVG' — custom SVG content
-    // Restore custom SVG into the store before setting the select value
     if (p[svgKey] !== undefined) {
       customSVG[prefix] = p[svgKey];
     }
     if (p[typeKey] !== undefined) {
-      document.getElementById(`${prefix}-type`).value = p[typeKey];
+      txState[prefix] = p[typeKey];
+      // Sync icon if already rendered (may not be on first load — _syncTxIcons handles that)
+      if (document.getElementById(`${prefix}-icon`)) syncTxIcon(prefix);
     }
     if (p[colKey] !== undefined) {
       const picker = document.getElementById(`${prefix}-color`);
@@ -1390,118 +1547,273 @@ wireOverlay('pm');
 
 document.getElementById('md-mode').addEventListener('change', () => { update(); syncPresetHighlight(); });
 
-// Wire texture controls (type select + upload button + colour picker + hex input + alpha slider)
-(function wireTextures() {
-  ['tx1', 'tx2'].forEach(prefix => {
-    const sel       = document.getElementById(`${prefix}-type`);
-    const uploadBtn = document.getElementById(`${prefix}-upload`);
-    const fileInput = document.getElementById(`${prefix}-file`);
-    const picker    = document.getElementById(`${prefix}-color`);
-    const hexIn     = document.getElementById(`${prefix}-hex`);
-    const swatch    = document.getElementById(`${prefix}-sw`);
-    const slider    = document.getElementById(`${prefix}-alpha`);
-    const valEl     = document.getElementById(`${prefix}-alpha-val`);
+// ── Texture state ─────────────────────────────────────────────────────────────
+// Keyed by 'tx1' / 'tx2'. txType is a texture name (from library), 'custom', or 'none'.
+const txState = {
+  tx1: 'none',
+  tx2: 'none',
+};
 
-    // Initialise swatch and slider gradient from the default colour
-    swatch.style.background = picker.value;
-    setSliderGradient(slider, picker.value);
+// Returns a friendly display name for a texture id
+function txDisplayName(id) {
+  if (id === 'none') return 'None';
+  if (id === 'custom') return 'Custom';
+  // Convert kebab-case to Title Case
+  return id.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
 
-    // Helper: reflect whether a custom SVG is loaded onto the upload button
-    function syncUploadBtn() {
-      uploadBtn.classList.toggle('has-custom', !!customSVG[prefix]);
+// The no-texture SVG for the None option — served as-is, colours preserved
+const NO_TEXTURE_SVG = <?php
+$noTexFile = __DIR__ . '/images/textures/no-texture.svg';
+echo json_encode(is_readable($noTexFile) ? file_get_contents($noTexFile) : '', JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+?>;
+
+// Build a small preview SVG for the 40×40 icon/thumbnail.
+// None uses no-texture.svg as-is. All others use off-black (#1a1a1a) on off-white background.
+function makeThumbnailSVG(txId) {
+  if (txId === 'none' || txId === null) return NO_TEXTURE_SVG || '';
+  const svgSrc = txId === 'custom' ? customSVG.tx1 || customSVG.tx2 : TEXTURES[txId];
+  if (!svgSrc) return '';
+  return makeThumbnailSVGFromSrc(svgSrc);
+}
+
+// Update the icon box in the sidebar for a given prefix
+function syncTxIcon(prefix) {
+  const id     = txState[prefix];
+  const icon   = document.getElementById(`${prefix}-icon`);
+  const inner  = document.getElementById(`${prefix}-icon-inner`);
+  const label  = document.getElementById(`${prefix}-icon-label`);
+  const svgStr = id === 'none'
+    ? (NO_TEXTURE_SVG || '')
+    : id === 'custom'
+      ? (customSVG[prefix] ? makeThumbnailSVGFromSrc(customSVG[prefix]) : '')
+      : makeThumbnailSVG(id);
+  const displayName = txDisplayName(id);
+  inner.innerHTML = svgStr;
+  label.textContent = displayName;
+  icon.title = displayName;
+  icon.classList.toggle('active', id !== 'none');
+}
+
+function makeThumbnailSVGFromSrc(svgSrc) {
+  if (!svgSrc) return '';
+  let vbAttr = 'viewBox="0 0 64 64"';
+  const vbMatch = svgSrc.match(/viewBox=["']([^"']*)["']/);
+  if (vbMatch) vbAttr = `viewBox="${vbMatch[1]}"`;
+  const inner = svgSrc.replace(/^<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '');
+  return `<svg xmlns="http://www.w3.org/2000/svg" ${vbAttr} width="100%" height="100%"><g fill="#1a1a1a" stroke="#1a1a1a">${inner}</g></svg>`;
+}
+
+// ── Texture picker (library sidebar overlay) ──────────────────────────────────
+let pickerActivePrefix = null; // which channel is being edited: 'tx1' or 'tx2'
+
+function openTexturePicker(prefix) {
+  pickerActivePrefix = prefix;
+  const picker = document.getElementById('tx-picker');
+  const title  = document.getElementById('tx-picker-title');
+  title.textContent = prefix === 'tx1' ? 'Light Squares — Choose Texture' : 'Dark Squares — Choose Texture';
+  renderLibraryPicker(prefix);
+  picker.style.display = 'flex';
+}
+
+function closeTexturePicker() {
+  document.getElementById('tx-picker').style.display = 'none';
+  pickerActivePrefix = null;
+}
+
+function renderLibraryPicker(prefix) {
+  const body = document.getElementById('tx-picker-body');
+  body.innerHTML = '';
+  const currentId = txState[prefix];
+
+  // None option — first group
+  const noneGroup = document.createElement('div');
+  noneGroup.className = 'tx-lib-group';
+  const noneItem = makeTxLibItem('none', currentId, prefix);
+  const noneGrid = document.createElement('div');
+  noneGrid.className = 'tx-lib-grid';
+  noneGrid.appendChild(noneItem);
+  noneGroup.appendChild(noneGrid);
+  body.appendChild(noneGroup);
+
+  // Library groups
+  for (const [groupKey, group] of Object.entries(TEXTURE_LIBRARY)) {
+    const groupEl = document.createElement('div');
+    groupEl.className = 'tx-lib-group';
+
+    const labelEl = document.createElement('div');
+    labelEl.className = 'tx-lib-group-label';
+    labelEl.textContent = group.label;
+    groupEl.appendChild(labelEl);
+
+    const grid = document.createElement('div');
+    grid.className = 'tx-lib-grid';
+
+    for (const [name] of Object.entries(group.textures)) {
+      grid.appendChild(makeTxLibItem(name, currentId, prefix));
     }
-    syncUploadBtn();
+    groupEl.appendChild(grid);
+    body.appendChild(groupEl);
+  }
 
-    // Select change — selecting 'custom' from the dropdown triggers an upload.
-    // All other values just call update() normally.
-    sel.addEventListener('change', () => {
-      if (sel.value === 'custom') {
-        triggerUpload();
-        return;
-      }
-      update();
-    });
+  // Upload custom group
+  const uploadGroup = document.createElement('div');
+  uploadGroup.className = 'tx-lib-group';
+  const uploadLabel = document.createElement('div');
+  uploadLabel.className = 'tx-lib-group-label';
+  uploadLabel.textContent = 'Custom';
+  uploadGroup.appendChild(uploadLabel);
+  const uploadGrid = document.createElement('div');
+  uploadGrid.className = 'tx-lib-grid';
 
-    // Upload button — always triggers a new file pick regardless of current state
-    uploadBtn.addEventListener('click', () => {
-      triggerUpload();
-    });
+  // If custom SVG is loaded, show it as an option
+  if (customSVG[prefix]) {
+    uploadGrid.appendChild(makeTxLibItem('custom', currentId, prefix));
+  }
 
-    function triggerUpload() {
-      fileInput.value = ''; // reset so the same file can be re-selected
-      fileInput.click();
+  // Upload card
+  const uploadItem = document.createElement('div');
+  uploadItem.className = 'tx-lib-item tx-lib-upload';
+  uploadItem.title = 'Upload SVG file';
+  const uploadThumb = document.createElement('div');
+  uploadThumb.className = 'tx-lib-thumb';
+  uploadThumb.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>`;
+  const uploadName = document.createElement('div');
+  uploadName.className = 'tx-lib-name';
+  uploadName.textContent = 'Upload';
+  uploadItem.appendChild(uploadThumb);
+  uploadItem.appendChild(uploadName);
+  uploadItem.addEventListener('click', () => triggerUpload(prefix));
+  uploadGrid.appendChild(uploadItem);
+  uploadGroup.appendChild(uploadGrid);
+  body.appendChild(uploadGroup);
+}
+
+function makeTxLibItem(txId, currentId, prefix) {
+  const displayName = txDisplayName(txId);
+  const item = document.createElement('div');
+  item.className = 'tx-lib-item' + (txId === currentId ? ' active' : '');
+  item.title = displayName;
+
+  const thumb = document.createElement('div');
+  thumb.className = 'tx-lib-thumb';
+
+  if (txId === 'none') {
+    thumb.innerHTML = NO_TEXTURE_SVG || '';
+  } else {
+    const svgSrc = txId === 'custom' ? customSVG[prefix] : TEXTURES[txId];
+    if (svgSrc) {
+      thumb.innerHTML = makeThumbnailSVGFromSrc(svgSrc);
     }
+  }
 
-    // Handle file selection result
-    fileInput.addEventListener('change', () => {
-      const file = fileInput.files[0];
-      if (!file) return;
+  const name = document.createElement('div');
+  name.className = 'tx-lib-name';
+  name.textContent = displayName;
 
-      const reader = new FileReader();
-      reader.onload = e => {
-        const raw = e.target.result;
-        if (!raw || !/<svg[\s>]/i.test(raw)) {
-          // Invalid file — revert to none
-          customSVG[prefix] = null;
-          sel.value = 'none';
-          syncUploadBtn();
-          update();
-          return;
-        }
-        customSVG[prefix] = sanitiseSVG(raw);
-        sel.value = 'custom';
-        syncUploadBtn();
-        update();
-      };
-      reader.onerror = () => {
-        // Read error — revert to none
-        customSVG[prefix] = null;
-        sel.value = 'none';
-        syncUploadBtn();
-        update();
-      };
-      reader.readAsText(file);
+  item.appendChild(thumb);
+  item.appendChild(name);
+
+  item.addEventListener('click', () => {
+    // Apply immediately and update preview — stay in picker
+    txState[prefix] = txId;
+    syncTxIcon(prefix);
+    update();
+    // Update active highlight within picker
+    document.querySelectorAll('#tx-picker-body .tx-lib-item:not(.tx-lib-upload)').forEach(el => {
+      el.classList.remove('active');
     });
-
-    picker.addEventListener('input', () => {
-      hexIn.value = picker.value;
-      hexIn.classList.remove('bad');
-      swatch.style.background = picker.value;
-      setSliderGradient(slider, picker.value);
-      update();
-    });
-
-    hexIn.addEventListener('input', () => {
-      const v = hexIn.value.trim();
-      if (/^#[0-9A-Fa-f]{6}$/.test(v)) {
-        picker.value = v;
-        hexIn.classList.remove('bad');
-        swatch.style.background = v;
-        setSliderGradient(slider, v);
-        update();
-      } else {
-        hexIn.classList.add('bad');
-      }
-    });
-
-    slider.addEventListener('input', () => {
-      valEl.textContent = slider.value + '%';
-      update();
-    });
+    item.classList.add('active');
   });
 
-  // Exposed so loadFromParams can sync button states after restoring custom SVGs
-  window._syncUploadBtns = () => {
-    ['tx1', 'tx2'].forEach(prefix => {
-      const btn = document.getElementById(`${prefix}-upload`);
-      if (btn) btn.classList.toggle('has-custom', !!customSVG[prefix]);
-    });
-  };
-})();
+  return item;
+}
+
+// ── Upload handling ────────────────────────────────────────────────────────────
+function triggerUpload(prefix) {
+  const fileInput = document.getElementById(`${prefix}-file`);
+  fileInput.value = '';
+  fileInput.click();
+}
+
+['tx1', 'tx2'].forEach(prefix => {
+  const fileInput = document.getElementById(`${prefix}-file`);
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const raw = e.target.result;
+      if (!raw || !/<svg[\s>]/i.test(raw)) {
+        customSVG[prefix] = null;
+        update();
+        return;
+      }
+      customSVG[prefix] = sanitiseSVG(raw);
+      txState[prefix] = 'custom';
+      syncTxIcon(prefix);
+      update();
+      // Refresh picker if open for this prefix
+      if (pickerActivePrefix === prefix) {
+        renderLibraryPicker(prefix);
+      }
+    };
+    reader.onerror = () => { customSVG[prefix] = null; update(); };
+    reader.readAsText(file);
+  });
+
+  // Click on icon box opens the picker
+  document.getElementById(`${prefix}-icon`).addEventListener('click', () => {
+    openTexturePicker(prefix);
+  });
+
+  // Wire colour + alpha controls
+  const picker = document.getElementById(`${prefix}-color`);
+  const hexIn  = document.getElementById(`${prefix}-hex`);
+  const swatch = document.getElementById(`${prefix}-sw`);
+  const slider = document.getElementById(`${prefix}-alpha`);
+  const valEl  = document.getElementById(`${prefix}-alpha-val`);
+
+  swatch.style.background = picker.value;
+  setSliderGradient(slider, picker.value);
+
+  picker.addEventListener('input', () => {
+    hexIn.value = picker.value;
+    hexIn.classList.remove('bad');
+    swatch.style.background = picker.value;
+    setSliderGradient(slider, picker.value);
+    update();
+  });
+  hexIn.addEventListener('input', () => {
+    const v = hexIn.value.trim();
+    if (/^#[0-9A-Fa-f]{6}$/.test(v)) {
+      picker.value = v;
+      hexIn.classList.remove('bad');
+      swatch.style.background = v;
+      setSliderGradient(slider, v);
+      update();
+    } else {
+      hexIn.classList.add('bad');
+    }
+  });
+  slider.addEventListener('input', () => {
+    valEl.textContent = slider.value + '%';
+    update();
+  });
+});
+
+document.getElementById('tx-picker-back').addEventListener('click', closeTexturePicker);
+
+// Initialise icon boxes
+syncTxIcon('tx1');
+syncTxIcon('tx2');
+
+// Exposed for loadFromParams
+window._syncTxIcons = () => { syncTxIcon('tx1'); syncTxIcon('tx2'); };
 
 renderPresets('duo');
 loadFromParams();
-window._syncUploadBtns();
+if (window._syncTxIcons) window._syncTxIcons();
 
 document.getElementById('install-btn').addEventListener('click', () => {
   window.open(`/style.user.css?${buildStyleParams()}`, '_blank');
@@ -1524,10 +1836,10 @@ function buildStyleParams() {
     oca:    document.getElementById('oc-alpha').value,
     pm:     document.getElementById('pm-color').value.slice(1),
     pma:    document.getElementById('pm-alpha').value,
-    tx1:    document.getElementById('tx1-type').value,
+    tx1:    txState.tx1,
     tx1a:   document.getElementById('tx1-alpha').value,
     tx1c:   document.getElementById('tx1-color').value.slice(1),
-    tx2:    document.getElementById('tx2-type').value,
+    tx2:    txState.tx2,
     tx2a:   document.getElementById('tx2-alpha').value,
     tx2c:   document.getElementById('tx2-color').value.slice(1),
   };
@@ -1585,6 +1897,7 @@ function loadFromParams() {
     tx2: texture('tx2', 'none'), tx2A: alpha('tx2a', 10), tx2C: hex('tx2c', '000000'),
   });
   syncPresetHighlight();
+  if (window._syncTxIcons) window._syncTxIcons();
   history.replaceState(null, '', location.pathname);
 }
 
