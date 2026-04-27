@@ -42,6 +42,7 @@
       font-size: 14px;
       min-height: 100vh;
       padding: 1.25rem 1rem;
+      overflow-x: hidden;
     }
 
     .container {
@@ -280,9 +281,10 @@
       grid-template-columns: 1fr 380px;
       gap: 1rem;
       align-items: stretch;
+      min-width: 0;
     }
 
-    @media (max-width: 860px) {
+    @media (max-width: 680px) {
       .page-grid { grid-template-columns: 1fr; }
     }
 
@@ -291,6 +293,7 @@
       flex-direction: column;
       gap: 0.5rem;
       height: 100%;
+      min-width: 0;
     }
 
     .sidebar {
@@ -667,10 +670,32 @@
       transition: background 0.15s, transform 0.1s;
       min-width: 108px;
       height: 2.1rem;
+      white-space: nowrap;
     }
     .copy-btn:hover  { background: var(--accent-h); }
     .copy-btn:active { transform: scale(0.96); }
     .copy-btn.ok     { background: var(--green); }
+
+    .output-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .output-header > div {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 680px) {
+      .copy-btn {
+        min-width: unset;
+        padding: 0.5rem 0.6rem;
+      }
+      .copy-btn .btn-label { display: none; }
+    }
   /* ── Reset button ── */
     .reset-btn {
       margin-top: 0.75rem;
@@ -776,7 +801,7 @@
                 <path d="M8 13l4 4 4-4"/>
                 <path d="M3 19v1a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-1"/>
               </svg>
-              Install
+              <span class="btn-label">Install</span>
             </button>
             <button class="copy-btn" id="download-btn">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -785,21 +810,21 @@
                 <path d="M12 11v6"/>
                 <path d="M9 15l3 3 3-3"/>
               </svg>
-              Download
+              <span class="btn-label">Download</span>
             </button>
             <button class="copy-btn" id="share-btn">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
                 <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
               </svg>
-              Share
+              <span class="btn-label">Share</span>
             </button>
             <button class="copy-btn" id="copy-btn">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="9" y="9" width="13" height="13" rx="2"/>
                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
               </svg>
-              Copy
+              <span class="btn-label">Copy</span>
             </button>
           </div>
         </div>
@@ -1929,10 +1954,10 @@ document.getElementById('share-btn').addEventListener('click', async () => {
     document.execCommand('copy');
     document.body.removeChild(ta);
   }
-  btn.innerHTML = '✓ Link copied!';
+  btn.innerHTML = '✓ <span class="btn-label">Link copied!</span>';
   btn.classList.add('ok');
   setTimeout(() => {
-    btn.innerHTML = SHARE_SVG + ' Share';
+    btn.innerHTML = SHARE_SVG + ' <span class="btn-label">Share</span>';
     btn.classList.remove('ok');
   }, 2000);
 });
@@ -1949,10 +1974,10 @@ document.getElementById('copy-btn').addEventListener('click', async () => {
     ta.select();
     document.execCommand('copy');
   }
-  btn.innerHTML = '✓ Copied!';
+  btn.innerHTML = '✓ <span class="btn-label">Copied!</span>';
   btn.classList.add('ok');
   setTimeout(() => {
-    btn.innerHTML = COPY_SVG + ' Copy';
+    btn.innerHTML = COPY_SVG + ' <span class="btn-label">Copy</span>';
     btn.classList.remove('ok');
   }, 2000);
 });
