@@ -40,6 +40,25 @@ Lichess Tailor is a web tool for generating custom user styles for [lichess.org]
    ```
 3. Visit the site, choose a preset or customise colours and overlays.
 
+## Textures
+
+Lichess Tailor supports applying SVG textures to light and dark squares independently. Only `.svg` files are accepted; raster image formats (PNG, JPG, etc.) are not supported.
+
+### Sourcing textures
+
+SVG textures can be found across many free and paid resources online. [Flaticon](https://www.flaticon.com) is a recommended starting point with a large library of SVG icons and patterns available for download.
+
+### Converting images to SVG
+
+If you have a raster image (PNG, JPG, etc.) that you want to use as a texture, it can be converted to SVG using an online tool such as [PicSVG](https://picsvg.com). Note that conversions from raster images are approximate; simple high-contrast images tend to convert best.
+
+### Optimising SVGs
+
+SVG files sourced from the web often contain unnecessary metadata, editor comments, and redundant attributes that inflate their size. It is highly recommended to optimise your SVG before uploading to keep performance snappy and share/install URLs manageable. Good tools for this include:
+
+- [SVGOMG](https://svgomg.net): a feature-rich optimiser with fine-grained control
+- [SVG Viewer](https://www.svgviewer.dev): lets you view, edit, and optimise SVGs in the browser
+
 ## Contributions
 
 Contributions are always welcome!  
