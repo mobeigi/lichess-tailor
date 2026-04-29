@@ -20,6 +20,11 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-title" content="Lichess Tailor">
   <link rel="manifest" href="/site.webmanifest">
+  
+  <link rel="modulepreload" href="/assets/js/app.min.js">
+  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/@lichess-org/chessground@10.1.1/+esm">
+  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/chess.js@1.1.0/+esm">
+  
   <link rel="stylesheet" href="/assets/css/style.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@lichess-org/chessground@10.1.1/assets/chessground.base.min.css">
   
