@@ -482,11 +482,12 @@
     .tx-picker {
       position: absolute;
       inset: 0;
-      background: var(--bg);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
       z-index: 10;
       display: flex;
       flex-direction: column;
-      border-radius: inherit;
     }
     .tx-picker-header {
       display: flex;
