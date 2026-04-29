@@ -26,24 +26,8 @@ function toRgba(string $hex, int $alpha): string
     return "rgba($r, $g, $b, $a)";
 }
 
-// Texture registry — loaded from /images/textures/library/<group>/*.svg
-// To add a texture: drop the SVG in the right subfolder — no code changes needed.
-$libDir = __DIR__ . '/images/textures/library/';
-$texturePaths = [];
-$groupDirs = glob($libDir . '*', GLOB_ONLYDIR);
-if ($groupDirs) {
-    sort($groupDirs);
-    foreach ($groupDirs as $groupDir) {
-        $files = glob($groupDir . '/*.svg');
-        if ($files) {
-            sort($files);
-            foreach ($files as $file) {
-                $name = basename($file, '.svg');
-                $texturePaths[$name] = file_get_contents($file);
-            }
-        }
-    }
-}
+require_once __DIR__ . '/includes/TextureLibrary.php';
+$texturePaths = TextureLibrary::getFlatTextures();
 
 function makeTexturePattern(string $patId, string $txId, int $alphaPercent, string $colour, string $customSvg, array $texturePaths): string
 {
