@@ -757,7 +757,7 @@ loadFromParams();
 if (window._syncTxIcons) window._syncTxIcons();
 
 document.getElementById('install-btn').addEventListener('click', () => {
-  window.open(`/style.php?${buildStyleParams()}`, '_blank');
+  window.open(`/style.user.css?${buildStyleParams()}`, '_blank');
 });
 
 function buildStyleParams() {
