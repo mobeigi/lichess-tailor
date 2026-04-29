@@ -1,4 +1,3 @@
-<?php require_once __DIR__ . '/includes/TextureLibrary.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -344,12 +343,6 @@
   </div><!-- /page-grid -->
 </div>
 
-<script>
-  window.LichessTailorEnv = {
-    TEXTURE_LIBRARY: <?php echo json_encode(TextureLibrary::getGroupedTextures(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>,
-    NO_TEXTURE_SVG: <?php echo json_encode(TextureLibrary::getNoTextureSvg(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>
-  };
-</script>
 <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <script type="module" src="/assets/js/app.min.js"></script>
 </body>

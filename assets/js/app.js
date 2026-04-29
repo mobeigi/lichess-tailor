@@ -5,18 +5,37 @@ import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1.1.0/+esm';
 // Loaded server-side from /assets/images/textures/library/<group>/<name>.svg
 // Structure: { groupKey: { label: string, textures: { name: svgString } } }
 // To add a texture: drop the SVG in the right subfolder — no code changes needed.
-const TEXTURE_LIBRARY = window.LichessTailorEnv.TEXTURE_LIBRARY;
+let TEXTURE_LIBRARY = {};
 
 // Flat lookup: textureName -> svgString (for makeTexturePattern)
-const TEXTURES = (() => {
-  const flat = {};
-  for (const group of Object.values(TEXTURE_LIBRARY)) {
-    for (const [name, svg] of Object.entries(group.textures)) {
-      flat[name] = svg;
+let TEXTURES = {};
+let NO_TEXTURE_SVG = '';
+
+// Async initialization
+async function loadTextures() {
+  try {
+    const res = await fetch('/api/textures.php');
+    const data = await res.json();
+    TEXTURE_LIBRARY = data.TEXTURE_LIBRARY;
+    NO_TEXTURE_SVG = data.NO_TEXTURE_SVG;
+    
+    // Build flat lookup
+    for (const group of Object.values(TEXTURE_LIBRARY)) {
+      for (const [name, svg] of Object.entries(group.textures)) {
+        TEXTURES[name] = svg;
+      }
     }
+    
+    // Initialise icon boxes only after textures load
+    syncTxIcon('tx1');
+    syncTxIcon('tx2');
+    update();
+  } catch (err) {
+    console.error('Failed to load textures from API:', err);
   }
-  return flat;
-})();
+}
+loadTextures();
+
 
 // ── Custom SVG store ─────────────────────────────────────────────────────────
 // Holds the raw SVG string for each channel when the user uploads a file.
@@ -507,7 +526,7 @@ function txDisplayName(id) {
 }
 
 // The no-texture SVG for the None option — served as-is, colours preserved
-const NO_TEXTURE_SVG = window.LichessTailorEnv.NO_TEXTURE_SVG;
+
 
 // Build a small preview SVG for the 40×40 icon/thumbnail.
 // None uses no-texture.svg as-is. All others use off-black (#1a1a1a) on off-white background.
@@ -745,9 +764,7 @@ function triggerUpload(prefix) {
 
 document.getElementById('tx-picker-back').addEventListener('click', closeTexturePicker);
 
-// Initialise icon boxes
-syncTxIcon('tx1');
-syncTxIcon('tx2');
+
 
 // Exposed for loadFromParams
 window._syncTxIcons = () => { syncTxIcon('tx1'); syncTxIcon('tx2'); };
