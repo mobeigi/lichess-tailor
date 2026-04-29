@@ -35,7 +35,7 @@
 
   <header>
     <a href="/" class="header-title">
-      <img src="/assets/images/logo512.png" alt="Lichess Tailor logo" class="header-logo">
+      <img src="/assets/images/logo128.png" alt="Lichess Tailor logo" class="header-logo">
       <h1>Lichess Tailor</h1>
     </a>
     <p>
@@ -350,7 +350,7 @@
     NO_TEXTURE_SVG: <?php echo json_encode(TextureLibrary::getNoTextureSvg(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?>
   };
 </script>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <script type="module" src="/assets/js/app.min.js"></script>
 </body>
 </html>
