@@ -447,6 +447,7 @@
       align-items: center;
       gap: 0.3rem;
       flex-shrink: 0;
+      width: 40px;
     }
     .tx-icon {
       width: 40px;
@@ -470,7 +471,8 @@
       font-size: 0.65rem;
       color: var(--muted);
       text-align: center;
-      max-width: 56px;
+      width: 48px;
+      margin: 0 -4px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -547,6 +549,7 @@
       align-items: center;
       gap: 0.3rem;
       cursor: pointer;
+      width: 40px;
     }
     .tx-lib-thumb {
       width: 40px;
@@ -564,7 +567,7 @@
     .tx-lib-thumb svg { width: 100%; height: 100%; }
     .tx-lib-item:hover .tx-lib-thumb { border-color: var(--muted); }
     .tx-lib-item.active .tx-lib-thumb { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(124,58,237,0.3); }
-    .tx-lib-name { font-size: 0.65rem; color: var(--muted); text-align: center; max-width: 56px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tx-lib-name { font-size: 0.65rem; color: var(--muted); text-align: center; width: 48px; margin: 0 -4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .tx-lib-item.active .tx-lib-name { color: var(--text); }
     /* Upload card in library */
     .tx-lib-upload .tx-lib-thumb {
