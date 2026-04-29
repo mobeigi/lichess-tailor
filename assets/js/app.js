@@ -34,7 +34,7 @@ async function loadTextures() {
     console.error('Failed to load textures from API:', err);
   }
 }
-loadTextures();
+
 
 
 // ── Custom SVG store ─────────────────────────────────────────────────────────
@@ -769,9 +769,12 @@ document.getElementById('tx-picker-back').addEventListener('click', closeTexture
 // Exposed for loadFromParams
 window._syncTxIcons = () => { syncTxIcon('tx1'); syncTxIcon('tx2'); };
 
-renderPresets('duo');
-loadFromParams();
-if (window._syncTxIcons) window._syncTxIcons();
+(async () => {
+  await loadTextures(); // Wait for textures to load BEFORE rendering UI and parsing params
+  renderPresets('duo');
+  loadFromParams();
+  if (window._syncTxIcons) window._syncTxIcons();
+})();
 
 document.getElementById('install-btn').addEventListener('click', () => {
   window.open(`/style.user.css?${buildStyleParams()}`, '_blank');
